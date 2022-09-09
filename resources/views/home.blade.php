@@ -2,14 +2,14 @@
 
 @section('title','Dashboard')
 @section('side-bar')
-    <div class="sidebar-panel">
+    <!-- <div class="sidebar-panel">
         <div class="gull-brand mt-3 p-2">
             <input type="search" class="form-control" name="search" id="search" placeholder="Search">
-            <!--  <span class=" item-name text-20 text-primary font-weight-700">GULL</span> -->
+             <span class=" item-name text-20 text-primary font-weight-700">GULL</span>
             
-        </div>
+        </div> -->
         <!--  user -->
-        <div class="scroll-nav ps ps--active-y" data-perfect-scrollbar="data-perfect-scrollbar" data-suppress-scroll-x="true">
+        <!-- <div class="scroll-nav ps ps--active-y" data-perfect-scrollbar="data-perfect-scrollbar" data-suppress-scroll-x="true">
             <div class="side-nav">
                 <div class="main-menu">
                     <ul class="metismenu" id="menu">
@@ -21,9 +21,9 @@
                     </ul>
                 </div>
             </div>
-        </div>
+        </div> -->
         <!--  side-nav-close -->
-    </div>
+    <!-- </div> -->
 @endsection
 @section('content')
 <div class="row justify-content-center">

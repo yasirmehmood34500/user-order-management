@@ -2,14 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ContactsController;
-use App\Http\Controllers\CompanyController;
-use App\Http\Controllers\BuyOrderController;
-use App\Http\Controllers\SellOrderController;
-use App\Http\Controllers\PairedOrderController;
-use App\Http\Controllers\AcqTargetController;
-use App\Http\Controllers\CurrentHoldingController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -26,14 +18,25 @@ Auth::routes();
 Route::get('/', function () {
     return view('auth.login');
 });
+
 // Route::get('login', [UserController::class, 'login_page'])->name("login_page");
 Route::get('dashboard', [UserController::class, 'dashboard_page'])->name("dashboard_page");
 
-Route::get('/home', [HomeController::class, 'index'])->name('home_page');
-Route::get('/contacts', [ContactsController::class, 'index'])->name('contact_page');
-Route::get('/companies', [CompanyController::class, 'index'])->name('company_page');
-Route::get('/buy-orders', [BuyOrderController::class, 'index'])->name('buy_order_page');
-Route::get('/sell-orders', [SellOrderController::class, 'index'])->name('sell_order_page');
-Route::get('/paired-order', [PairedOrderController::class, 'index'])->name('paired_order_page');
-Route::get('/acquistion-targets', [AcqTargetController::class, 'index'])->name('acquistion_target_page');
-Route::get('/current-holdings', [CurrentHoldingController::class, 'index'])->name('current_holding_page');
+Route::group(['middleware' => ['auth']], function() {
+    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    Route::get('/contacts', [App\Http\Controllers\ContactsController::class, 'index'])->name('contacts');
+
+    //    company
+    Route::get('/companies', [App\Http\Controllers\CompanyController::class, 'index'])->name('companies');
+    Route::post('/save-company', [App\Http\Controllers\CompanyController::class, 'store'])->name('save.companies');
+    Route::get('/edit-company/{id}', [App\Http\Controllers\CompanyController::class, 'edit'])->name('edit.companies');
+    Route::post('/update-company/{id}', [App\Http\Controllers\CompanyController::class, 'update'])->name('update.companies');
+
+    Route::get('/buy-orders', [App\Http\Controllers\BuyOrderController::class, 'index'])->name('buy-orders');
+    Route::get('/sell-orders', [App\Http\Controllers\SellOrderController::class, 'index'])->name('sell-orders');
+    Route::get('/paired-order', [App\Http\Controllers\PairedOrderController::class, 'index'])->name('paired-order');
+    Route::get('/acquistion-targets', [App\Http\Controllers\AcqTargetController::class, 'index'])->name('acquistion-targets');
+    Route::get('/current-holdings', [App\Http\Controllers\CurrentHoldingController::class, 'index'])->name('current-holdings');
+    Route::get('/current-holdings', [App\Http\Controllers\CurrentHoldingController::class, 'index'])->name('current-holdings');
+
+});

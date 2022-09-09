@@ -2,19 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Business;
+use App\Models\Company;
+use App\Models\Location;
+use App\Models\Sector;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class CompanyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index()
     {
-        return view('admin.companies.index');
-        
+        $companies = Company::all();
+        $sectors = Sector::all();
+        $business = Business::all();
+        $locations = Location::all();
+        if (\request('search')){
+            $activeCompany = Company::where('company_id',\request('search'))->first();
+        } else {
+            $activeCompany = $companies[0];
+        }
+        $data = [
+            'all_companies'=>$companies,
+            'sectors'=>$sectors,
+            'business'=>$business,
+            'locations'=>$locations,
+            'active_company'=>$activeCompany
+        ];
+        return view('admin.companies.index',$data);
     }
 
     /**
@@ -35,41 +52,54 @@ class CompanyController extends Controller
      */
     public function store(Request $request)
     {
-        //
+//        dd($request->all());
+        $company = Company::create([
+            'comp_name'=>$request->company_name,
+            'geog_id'=>$request->location,
+            'invest_stage'=>$request->invest_stage,
+            'comment'=>$request->comment,
+            'sector_id'=>$request->sectors,
+            'business_id'=>$request->business_orient,
+            'deal_type'=>$request->deal_type,
+            'background'=>$request->company_background
+        ]);
+
+        if ($company) {
+            return response()->json(['status' => true, 'message' => 'company saved']);
+        }else{
+            return response()->json(['status' => false, 'message' => 'Some thing went wrong']);
+        }
+
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
-        //
+        $company = Company::where('company_id',$id)->first();
+        return response()->json(['status' => true, 'data' => $company]);
+
+
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
     public function update(Request $request, $id)
     {
-        //
+        $company = Company::where('id',$id)->update([
+            'comp_name'=>$request->up_comp_name,
+            'geog_id'=>$request->up_location,
+            'estsize'=>$request->up_invest_stage,
+            'comment'=>$request->up_comment,
+            'sector_id'=>$request->up_sector,
+            'business_id'=>$request->up_business,
+            'deal_type'=>$request->up_deal_type,
+            'background'=>$request->up_company_background
+        ]);
+
+        if ($company) {
+            return response()->json(['status' => true, 'message' => 'company updated']);
+        }else{
+            return response()->json(['status' => false, 'message' => 'Some thing went wrong']);
+        }
     }
 
     /**
