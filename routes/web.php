@@ -24,13 +24,19 @@ Route::get('dashboard', [UserController::class, 'dashboard_page'])->name("dashbo
 
 Route::group(['middleware' => ['auth']], function() {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-    Route::get('/contacts', [App\Http\Controllers\ContactsController::class, 'index'])->name('contacts');
 
     //    company
     Route::get('/companies', [App\Http\Controllers\CompanyController::class, 'index'])->name('companies');
     Route::post('/save-company', [App\Http\Controllers\CompanyController::class, 'store'])->name('save.companies');
     Route::get('/edit-company/{id}', [App\Http\Controllers\CompanyController::class, 'edit'])->name('edit.companies');
     Route::post('/update-company/{id}', [App\Http\Controllers\CompanyController::class, 'update'])->name('update.companies');
+
+//    user
+    Route::get('/contacts', [App\Http\Controllers\ContactsController::class, 'index'])->name('contacts');
+    Route::post('/save-user', [App\Http\Controllers\ContactsController::class, 'store'])->name('contacts.store');
+    Route::post('/update-user/{id}', [App\Http\Controllers\ContactsController::class, 'update'])->name('contacts.update');
+
+    Route::get('/get-buy-orders', [App\Http\Controllers\BuyOrderController::class, 'buyOrders'])->name('buyOrders');
 
     Route::get('/buy-orders', [App\Http\Controllers\BuyOrderController::class, 'index'])->name('buy-orders');
     Route::get('/sell-orders', [App\Http\Controllers\SellOrderController::class, 'index'])->name('sell-orders');

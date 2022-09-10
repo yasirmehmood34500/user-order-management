@@ -47,7 +47,24 @@
 
                 <div class="card-body">
 
-                    <h1>{{$active_company->comp_name}}</h1>
+                    <div class="row">
+                        <p class="font-weight-bold col-md-2">Company Name:</p>
+                        <span class="col-md-4">{{ strtoupper($active_company->comp_name) }}</span>
+                        <p class="font-weight-bold col-md-2">Invest Stage:</p>
+                        <span class="col-md-4">{{ $active_company->invest_stage }}</span>
+                    </div>
+                    <div class="row">
+                        <p class="font-weight-bold col-md-2">Sector:</p>
+                        <span class="col-md-4">{{ $active_company->sector_id }}</span>
+                        <p class="font-weight-bold col-md-2">Location:</p>
+                        <span class="col-md-4">{{ $active_company->geog_id }}</span>
+                    </div>
+                    <div class="row">
+                        <p class="font-weight-bold col-md-2">Business:</p>
+                        <span class="col-md-4">{{ $active_company->business_id }}</span>
+                        <p class="font-weight-bold col-md-2">Background:</p>
+                        <span class="col-md-4">{{ $active_company->background }}</span>
+                    </div>
                 </div>
             </div>
             <!--Add Modal -->
@@ -222,28 +239,17 @@
             });
         });
         $("#editButton").click(function () {
-            let id = $('#company_id').val();
-            {{--$.ajax({--}}
-            {{--    type: "GET",--}}
-            {{--    url: "{{url('edit-company')}}" + '/' + id,--}}
-
-            {{--    success: function (result) {--}}
-            {{--        if (result.status) {--}}
-            {{--            let data = result.data;--}}
-            {{--            console.log(data.comment)--}}
-                        $('#edit_company_name').val('{{$active_company->comp_name}}')
-                        $("#edit_location option[value=" + {{$active_company->geog_id}} + "]").prop("selected", true);
-                        $("#edit_invest_stage option[value='{{$active_company->invest_stage}}']").prop("selected", true);
-                        $("#edit_sectors option[value='{{$active_company->sector_id}}']").prop("selected", true);
-                        $("#edit_business_orient option[value='{{$active_company->business_id}}']").prop("selected", true);
-                        $('#edit_deal_type').val('{{$active_company->deal_type}}');
-                        $('#edit_company_background').val('{{$active_company->background}}');
-                        $('#edit_comment').val('{{$active_company->comment}}');
-            //         }
-            //     }
-            // });
+            $('#edit_company_name').val('{{$active_company->comp_name}}')
+            $("#edit_location option[value=" + {{$active_company->geog_id}} + "]").prop("selected", true);
+            $("#edit_invest_stage option[value='{{$active_company->invest_stage}}']").prop("selected", true);
+            $("#edit_sectors option[value='{{$active_company->sector_id}}']").prop("selected", true);
+            $("#edit_business_orient option[value='{{$active_company->business_id}}']").prop("selected", true);
+            $('#edit_deal_type').val('{{$active_company->deal_type}}');
+            $('#edit_company_background').val('{{$active_company->background}}');
+            $('#edit_comment').val('{{$active_company->comment}}');
         });
     </script>
+
     <!-- Search code -->
     <script>
         $(document).ready(function ($) {

@@ -11,6 +11,9 @@
     <link href="{{asset('dist-assets/css/plugins/perfect-scrollbar.css')}}" rel="stylesheet" />
     <link rel="stylesheet" href="{{asset('dist-assets/css/plugins/fontawesome-5.css')}}" />
     <link href="{{asset('dist-assets/css/plugins/metisMenu.min.css')}}" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+
 </head>
 
 <body class="text-left">
@@ -71,6 +74,7 @@
     <script src="{{asset('dist-assets/js/plugins/echarts.min.js')}}"></script>
     <script src="{{asset('dist-assets/js/scripts/echart.options.min.js')}}"></script>
     <script src="{{asset('dist-assets/js/scripts/dashboard.v1.script.min.js')}}"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 
     @stack('js')
 </body>

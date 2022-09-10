@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BuyOrder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\DataTables;
 
 class BuyOrderController extends Controller
 {
@@ -14,7 +17,26 @@ class BuyOrderController extends Controller
     public function index()
     {
         return view('admin.buy_orders.index');
-        
+
+    }
+    public function buyOrders(Request $request)
+    {
+
+        if ($request->ajax()) {
+            if (auth()->user()->hasRole('Admin')) {
+                $data = BuyOrder::query()->get();
+            }else{
+                $data = BuyOrder::query()->where('user_id',Auth::id())->get();
+            }
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('action', function($row){
+                    $btn = '<a href="javascript:void(0)" class="edit btn btn-primary btn-sm">Edit</a>';
+                    return $btn;
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
     }
 
     /**
