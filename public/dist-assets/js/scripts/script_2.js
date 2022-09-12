@@ -23,11 +23,11 @@ $(document).ready(function () {
 
   function mobileMenuClick() {
     // $appAdminWrap.toggleClass('sidebar-compact-onhover');
-    $(".app-admin-wrap.sidebar-full .sidebar-panel").addClass('sidebar-switch-open');
+    // $(".app-admin-wrap.sidebar-full .sidebar-panel").addClass('sidebar-switch-open');
   }
 
   function sidebarSwitchOverlay() {
-    $(".app-admin-wrap.sidebar-full .sidebar-panel").removeClass('sidebar-switch-open');
+    // $(".app-admin-wrap.sidebar-full .sidebar-panel").removeClass('sidebar-switch-open');
   }
 
   $mobileMenuCollapse.on("click", function () {

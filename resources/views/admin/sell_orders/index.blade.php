@@ -60,8 +60,10 @@
                     {data: 'valuation', name: 'valuation'},
                     {data: 'shareclass', name: 'shareclass'},
                     {data: 'structure', name: 'structure'},
+                        @if(auth()->user()->hasRole('Admin'))
                     {data: 'comments', name: 'comments'},
                     {data: 'action', name: 'action', orderable: false, searchable: false},
+                    @endif
                 ]
             });
 

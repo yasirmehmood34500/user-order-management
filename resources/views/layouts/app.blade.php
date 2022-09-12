@@ -18,7 +18,7 @@
 
 <body class="text-left">
     <div class="app-admin-wrap layout-sidebar-vertical sidebar-full">
-        <div class="sidebar-panel">
+        <div class="sidebar-panel position-fixed d-block">
             <div class="pt-4 pl-4">
                 <a href="/contacts">
                     <i class="i-Add-UserStar mr-3 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Contacts"></i>
@@ -26,15 +26,18 @@
                 <a href="/companies">
                     <i class="nav-icon i-File-Clipboard-Text--Image mr-3 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Companies"></i>
                 </a>
+                @if(auth()->user()->hasRole('Admin'))
                 <a href="/paired-order">
                     <i class="nav-icon i-Split-Vertical mr-3 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Paired Orders"></i>
                 </a>
+                @endif
                 <a href="/sell-orders">
                     <i class="nav-icon i-Line-Chart-2 mr-3  text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Sell Orders"></i>
                 </a>
                 <a href="/buy-orders">
                     <i class="nav-icon i-Add-Cart  mr-3 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Buy orders"></i>
                 </a>
+
 {{--                <a href="/acquistion-targets">--}}
 {{--                    <i class="i-Circular-Point  mr-3 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Acquistion Targets"></i>--}}
 {{--                </a>--}}
@@ -42,15 +45,25 @@
 {{--                    <i class="nav-icon i-Receipt-4 mr-3 text-20  cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Current Holdings"></i>--}}
 {{--                </a>--}}
             </div>
+            @if(auth()->user()->hasRole('Admin'))
             @yield('search')
             <div class="scroll-nav ps ps--active-y" data-perfect-scrollbar="data-perfect-scrollbar" data-suppress-scroll-x="true">
                 <div class="side-nav">
                     @yield('side-bar-links')
                 </div>
             </div>
+                @endif
         </div>
 
         <div class="main-content-wrap mobile-menu-content bg-off-white m-0">
+            <div class="text-right">
+                <form action="{{url('logout')}}" method="post">
+                    @csrf
+                    <button class="btn btn-muted btn-sm badge-outline-dark text-right">
+                        logout
+                    </button>
+                </form>
+            </div>
             <div class="main-content pt-4">
                 <div class="separator-breadcrumb border-top"></div>
             @yield('content')

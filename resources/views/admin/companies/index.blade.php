@@ -11,6 +11,7 @@
 @endsection
 
 @section('side-bar-links')
+
     <div class="main-menu">
         <ul class="metismenu live-search-list" id="menu" style="height: 100vh!important; ">
             @foreach($all_companies as $company)
@@ -196,10 +197,12 @@
                             <label for="company_background">Background</label>
                             <input type="text" class="form-control" id="company_background">
                         </div>
+                        @if(auth()->user()->hasRole('Admin'))
                         <div class="col-md-6 form-group">
                             <label for="comments">Comments</label>
                             <textarea name="comments" class="form-control" id="comment"></textarea>
                         </div>
+                            @endif
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -267,10 +270,12 @@
                             <label for="company_background">Background</label>
                             <input type="text" class="form-control" id="edit_company_background">
                         </div>
+                        @if(auth()->user()->hasRole('Admin'))
                         <div class="col-md-6 form-group">
                             <label for="comment">Comments</label>
                             <textarea name="comment" class="form-control" id="edit_comment"></textarea>
                         </div>
+                            @endif
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -338,10 +343,12 @@
                                 @endforeach
                             </select>
                         </div>
+                        @if(auth()->user()->hasRole('Admin'))
                         <div class="col-md-6 form-group">
                             <label for="bo_comment">Comments</label>
                             <textarea name="bo_comment" class="form-control" id="bo_comment"></textarea>
                         </div>
+                            @endif
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -409,10 +416,12 @@
                                 @endforeach
                             </select>
                         </div>
+                        @if(auth()->user()->hasRole('Admin'))
                         <div class="col-md-6 form-group">
                             <label for="bo_comment">Comments</label>
                             <textarea name="bo_comment" class="form-control" id="edit_bo_comment"></textarea>
                         </div>
+                            @endif
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -480,10 +489,12 @@
                                 @endforeach
                             </select>
                         </div>
+                        @if(auth()->user()->hasRole('Admin'))
                         <div class="col-md-6 form-group">
                             <label for="so_comment">Comments</label>
                             <textarea name="so_comment" class="form-control" id="so_comment"></textarea>
                         </div>
+                            @endif
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -551,10 +562,12 @@
                                 @endforeach
                             </select>
                         </div>
+                        @if(auth()->user()->hasRole('Admin'))
                         <div class="col-md-6 form-group">
                             <label for="so_comment">Comments</label>
                             <textarea name="so_comment" class="form-control" id="edit_so_comment"></textarea>
                         </div>
+                            @endif
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -624,8 +637,10 @@
                     {data: 'valuation', name: 'valuation'},
                     {data: 'shareclass', name: 'shareclass'},
                     {data: 'structure', name: 'structure'},
+                    @if(auth()->user()->hasRole('Admin'))
                     {data: 'comments', name: 'comments'},
                     {data: 'action', name: 'action', orderable: false, searchable: false},
+                    @endif
                 ]
             });
 
@@ -650,8 +665,10 @@
                     {data: 'valuation', name: 'valuation'},
                     {data: 'shareclass', name: 'shareclass'},
                     {data: 'structure', name: 'structure'},
+                        @if(auth()->user()->hasRole('Admin'))
                     {data: 'comments', name: 'comments'},
                     {data: 'action', name: 'action', orderable: false, searchable: false},
+                    @endif
                 ]
             });
 
