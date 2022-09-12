@@ -6,6 +6,7 @@ use App\Models\Business;
 use App\Models\Company;
 use App\Models\Location;
 use App\Models\Sector;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -19,6 +20,12 @@ class CompanyController extends Controller
         $sectors = Sector::all();
         $business = Business::all();
         $locations = Location::all();
+        $share_classes = DB::table('shareclass')->get();
+        $categories = DB::table('usercategory')->get();
+        $structures = DB::table('structure')->get();
+        $users = User::whereHas('roles',function ($q){
+            $q->where('name','User');
+        })->get();
         if (\request('search')){
             $activeCompany = Company::where('company_id',\request('search'))->first();
         } else {
@@ -29,7 +36,11 @@ class CompanyController extends Controller
             'sectors'=>$sectors,
             'business'=>$business,
             'locations'=>$locations,
-            'active_company'=>$activeCompany
+            'active_company'=>$activeCompany,
+            'share_classes'=>$share_classes,
+            'categories'=>$categories,
+            'structures'=>$structures,
+            'contacts'=>$users
         ];
         return view('admin.companies.index',$data);
     }
@@ -84,15 +95,15 @@ class CompanyController extends Controller
 
     public function update(Request $request, $id)
     {
-        $company = Company::where('id',$id)->update([
-            'comp_name'=>$request->up_comp_name,
-            'geog_id'=>$request->up_location,
-            'estsize'=>$request->up_invest_stage,
-            'comment'=>$request->up_comment,
-            'sector_id'=>$request->up_sector,
-            'business_id'=>$request->up_business,
-            'deal_type'=>$request->up_deal_type,
-            'background'=>$request->up_company_background
+        $company = Company::where('company_id',$id)->update([
+            'comp_name'=>$request->company_name,
+            'geog_id'=>$request->location,
+            'invest_stage'=>$request->invest_stage,
+            'comment'=>$request->comment,
+            'sector_id'=>$request->sectors,
+            'business_id'=>$request->business_orient,
+            'deal_type'=>$request->deal_type,
+            'background'=>$request->company_background
         ]);
 
         if ($company) {

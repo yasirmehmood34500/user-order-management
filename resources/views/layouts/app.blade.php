@@ -35,12 +35,12 @@
                 <a href="/buy-orders">
                     <i class="nav-icon i-Add-Cart  mr-3 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Buy orders"></i>
                 </a>
-                <a href="/acquistion-targets">
-                    <i class="i-Circular-Point  mr-3 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Acquistion Targets"></i>
-                </a>
-                <a href="/current-holdings">
-                    <i class="nav-icon i-Receipt-4 mr-3 text-20  cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Current Holdings"></i>
-                </a>
+{{--                <a href="/acquistion-targets">--}}
+{{--                    <i class="i-Circular-Point  mr-3 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Acquistion Targets"></i>--}}
+{{--                </a>--}}
+{{--                <a href="/current-holdings">--}}
+{{--                    <i class="nav-icon i-Receipt-4 mr-3 text-20  cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Current Holdings"></i>--}}
+{{--                </a>--}}
             </div>
             @yield('search')
             <div class="scroll-nav ps ps--active-y" data-perfect-scrollbar="data-perfect-scrollbar" data-suppress-scroll-x="true">
@@ -50,7 +50,6 @@
             </div>
         </div>
 
-{{--        <div class="switch-overlay"></div>--}}
         <div class="main-content-wrap mobile-menu-content bg-off-white m-0">
             <div class="main-content pt-4">
                 <div class="separator-breadcrumb border-top"></div>

@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Business;
 use App\Models\BuyOrder;
+use App\Models\Company;
 use App\Models\Location;
 use App\Models\Sector;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Yajra\DataTables\DataTables;
@@ -22,6 +24,10 @@ class ContactsController extends Controller
         $sectors = Sector::all();
         $business = Business::all();
         $locations = Location::all();
+        $companies = Company::all();
+        $share_classes = DB::table('shareclass')->get();
+        $categories = DB::table('usercategory')->get();
+        $structures = DB::table('structure')->get();
         if (\request('search')){
             $activeUser = User::where('id',\request('search'))->first();
         } else {
@@ -32,7 +38,11 @@ class ContactsController extends Controller
             'sectors'=>$sectors,
             'business'=>$business,
             'locations'=>$locations,
-            'active_user'=>$activeUser
+            'active_user'=>$activeUser,
+            'companies'=>$companies,
+             'share_classes'=>$share_classes,
+            'categories'=>$categories,
+            'structures'=>$structures,
         ];
         return view('admin.contacts.index',$data);
     }
