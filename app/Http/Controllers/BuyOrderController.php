@@ -38,6 +38,12 @@ class BuyOrderController extends Controller
             }
             return Datatables::of($data)
                 ->addIndexColumn()
+
+                ->addColumn('buy_id', function($row){
+                    $data = '<i class="fa-solid fa-code-merge text-danger font-weight-bold cursor-pointer p-1" style="background-color: #dde1e5;" data-toggle="modal"
+                        data-target="#pairBuyModal" onclick="pairOrder('.$row->buy_id.')"></i>'.$row->buy_id;
+                    return $data;
+                })
                 ->addColumn('contact', function($row){
                     $data = $row->Contact ? $row->Contact->name:'N/A';
                     return $data;
@@ -47,14 +53,11 @@ class BuyOrderController extends Controller
                     return $data;
                 })
                 ->addColumn('action', function($row){
-                    $btn = '<a href="javascript:void(0)" class="edit btn btn-primary btn-sm" data-toggle="modal"
-                        data-target="#editBuyModal" onclick="getBuyID('.$row->buy_id.')">Edit</a>'
-                    .'<a href="javascript:void(0)" class="edit btn btn-secondary btn-sm" data-toggle="modal"
-                        data-target="#pairBuyModal" onclick="pairOrder('.$row->buy_id.')">Pair</a>'
-                    ;
+                    $btn = '<i class="fa fa-edit font-weight-bold cursor-pointer p-1"  data-toggle="modal"  style="background-color: #dde1e5;"
+                        data-target="#editBuyModal" onclick="getBuyID('.$row->buy_id.')"></i>';
                     return $btn;
                 })
-                ->rawColumns(['action'])
+                ->rawColumns(['action','buy_id'])
                 ->make(true);
         }
     }

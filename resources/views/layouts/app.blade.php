@@ -9,17 +9,19 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,400i,600,700,800,900" rel="stylesheet" />
     <link href="{{asset('dist-assets/css/themes/lite-purple.css')}}" rel="stylesheet" />
     <link href="{{asset('dist-assets/css/plugins/perfect-scrollbar.css')}}" rel="stylesheet" />
-    <link rel="stylesheet" href="{{asset('dist-assets/css/plugins/fontawesome-5.css')}}" />
+{{--    <link rel="stylesheet" href="{{asset('dist-assets/css/plugins/fontawesome-5.css')}}" />--}}
     <link href="{{asset('dist-assets/css/plugins/metisMenu.min.css')}}" rel="stylesheet" />
     <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"/>
 </head>
 
 <body class="text-left">
-    <div class="app-admin-wrap layout-sidebar-vertical sidebar-full">
+    <div class="app-admin-wrap layout-sidebar-vertical sidebar-full ">
         <div class="sidebar-panel position-fixed d-block">
             <div class="pt-4 pl-4">
+
+
                 <a href="/contacts">
                     <i class="i-Add-UserStar mr-3 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Contacts"></i>
                 </a>

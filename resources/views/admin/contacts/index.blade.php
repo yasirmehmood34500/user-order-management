@@ -5,7 +5,7 @@
 @section('search')
     <div class="gull-brand mt-3 p-2">
         <hr style="margin-top:0 !important;">
-        <input type="search" class="form-control live-search-box" name="search" id="search" placeholder="Search">
+        <input type="search" class="form-control live-search-box" name="search" id="search" placeholder="Search" >
         <!--  <span class=" item-name text-20 text-primary font-weight-700">GULL</span> -->
     </div>
 @endsection
@@ -54,11 +54,11 @@
                         <p class="font-weight-bold col-md-2">Phone:</p>
                         <span class="col-md-4">{{ $active_user->phone }}</span>
                         <p class="font-weight-bold col-md-2">Location:</p>
-                        <span class="col-md-4">{{ $active_user->geog_id }}</span>
+                        <span class="col-md-4">{{ $active_user->Location ? $active_user->Location->geogarea : 'N/A'}}</span>
                     </div>
                     <div class="row">
                         <p class="font-weight-bold col-md-2">Sector:</p>
-                        <span class="col-md-4">{{ $active_user->sector_id }}</span>
+                        <span class="col-md-4">{{ $active_user->Sector ? $active_user->Sector->sectorname : 'N/A'}}</span>
                         <p class="font-weight-bold col-md-2">Address:</p>
                         <span class="col-md-4">{{ $active_user->street_address }}</span>
                     </div>
@@ -587,6 +587,10 @@
             var table = $('.buy-orders').DataTable({
                 processing: true,
                 serverSide: true,
+                "lengthMenu": [
+                    [20,40,100, 500, 1000, 1500],
+                    [20,40,100, 500, 1000, 1500],
+                ],
                 ajax: {
                     url:"{{ route('buyOrders') }}",
                     data: function (d) {
@@ -771,9 +775,11 @@
         function pairOrder(id) {
             BuyOrderID=id;
             console.log(id);
+            $('.make-so-pair tbody').html('');
             $('.make-so-pair').DataTable({
                 processing: true,
                 serverSide: true,
+                "bDestroy": true,
                 ajax: {
                     url:"{{ route('forPairSellOrders') }}",
                     data: function (d) {

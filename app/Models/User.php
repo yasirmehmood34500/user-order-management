@@ -38,4 +38,12 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function Location(){
+        return $this->belongsTo(Location::class, 'geog_id','geog_id');
+    }
+
+    public function Sector(){
+        return $this->belongsTo(Sector::class, 'sector_id','sector_id');
+    }
 }

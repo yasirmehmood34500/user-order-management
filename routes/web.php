@@ -16,7 +16,7 @@ Auth::routes();
 
 // dd('asdads');
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
 
 // Route::get('login', [UserController::class, 'login_page'])->name("login_page");

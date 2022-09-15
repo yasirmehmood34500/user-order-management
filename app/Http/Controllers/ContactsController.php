@@ -20,7 +20,7 @@ class ContactsController extends Controller
 
     public function index()
     {
-        $users = User::all();
+        $users = User::with(['Location','Sector'])->get();
         $sectors = Sector::all();
         $business = Business::all();
         $locations = Location::all();

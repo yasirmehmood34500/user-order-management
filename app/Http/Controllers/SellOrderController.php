@@ -2,10 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Business;
 use App\Models\BuyOrder;
+use App\Models\Company;
+use App\Models\Location;
+use App\Models\Sector;
 use App\Models\SellOrder;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
 
 class SellOrderController extends Controller
@@ -17,7 +23,31 @@ class SellOrderController extends Controller
      */
     public function index()
     {
-        return view('admin.sell_orders.index');
+        $users = User::with(['Location','Sector'])->get();
+        $sectors = Sector::all();
+        $business = Business::all();
+        $locations = Location::all();
+        $companies = Company::all();
+        $share_classes = DB::table('shareclass')->get();
+        $categories = DB::table('usercategory')->get();
+        $structures = DB::table('structure')->get();
+        if (\request('search')){
+            $activeUser = User::where('id',\request('search'))->first();
+        } else {
+            $activeUser = $users[0];
+        }
+        $data = [
+            'contacts'=>$users,
+            'sectors'=>$sectors,
+            'business'=>$business,
+            'locations'=>$locations,
+            'active_user'=>$activeUser,
+            'companies'=>$companies,
+            'share_classes'=>$share_classes,
+            'categories'=>$categories,
+            'structures'=>$structures,
+        ];
+        return view('admin.sell_orders.index',$data);
 
     }
     public function saleOrders(Request $request)
@@ -43,8 +73,10 @@ class SellOrderController extends Controller
                     $data = $row->Company ? $row->Company->comp_name:'N/A';
                     return $data;
                 })->addColumn('action', function($row){
-                    $btn = '<a href="javascript:void(0)" class="edit btn btn-primary btn-sm" data-toggle="modal"
-                        data-target="#editSOModal" onclick="getSO_ID('.$row->sell_id.')">Edit</a>';
+                    $btn = '<i class="fa fa-edit font-weight-bold cursor-pointer p-1" data-toggle="modal"
+                        data-target="#editSOModal" onclick="getSO_ID('.$row->sell_id.')"></i>';
+//                    $btn = '<a href="javascript:void(0)" class="edit btn btn-primary btn-sm" data-toggle="modal"
+//                        data-target="#editSOModal" onclick="getSO_ID('.$row->sell_id.')">Edit</a>';
                     return $btn;
                 })
                 ->rawColumns(['action'])

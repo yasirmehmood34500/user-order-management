@@ -55,10 +55,10 @@
                         <span class="col-md-4">{{ $active_company->invest_stage }}</span>
                     </div>
                     <div class="row">
-                        <p class="font-weight-bold col-md-2">Sector:</p>
-                        <span class="col-md-4">{{ $active_company->sector_id }}</span>
                         <p class="font-weight-bold col-md-2">Location:</p>
-                        <span class="col-md-4">{{ $active_company->geog_id }}</span>
+                        <span class="col-md-4">{{$active_company->Location ? $active_company->Location->geogarea : 'N/A'}}</span>
+                        <p class="font-weight-bold col-md-2">Sector:</p>
+                        <span class="col-md-4">{{$active_company->Sector ? $active_company->Sector->sectorname :'N/A' }}</span>
                     </div>
                     <div class="row">
                         <p class="font-weight-bold col-md-2">Business:</p>
