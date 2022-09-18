@@ -331,18 +331,18 @@
     </div>
 
     <!--Pair Order Modal -->
-    <div class="modal fade" id="pairBuyModal" tabindex="-1" role="dialog"
-         aria-labelledby="pairBuyModalLabel" aria-hidden="true">
+    <div class="modal fade" id="pairSOModal" tabindex="-1" role="dialog"
+         aria-labelledby="pairSOModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="pairBuyModalLabel">Sell Orders</h5>
+                    <h5 class="modal-title" id="pairSOModalLabel">Buy Orders</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <table class="table table-bordered make-so-pair">
+                    <table class="table table-bordered make-bo-pair">
                         <thead>
                         <tr>
                             <th>#</th>
@@ -354,13 +354,13 @@
                         </thead>
                     </table>
                     <div class="form-group">
-                        <label for="pair_bo_comment">Comments</label>
-                        <textarea name="pair_bo_comment" class="form-control" id="pair_bo_comment"></textarea>
+                        <label for="pair_so_comment">Comments</label>
+                        <textarea name="pair_so_comment" class="form-control" id="pair_so_comment"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="pairBuyOrder">Pair Now</button>
+                    <button type="button" class="btn btn-primary" id="pairSellOrder">Pair Now</button>
                 </div>
             </div>
         </div>
@@ -473,16 +473,56 @@
 
     <script>
 
-        $("#pairBuyOrder").click(function () {
+        let bo_arr=[];
+        function selectBO(id){
+            console.log(id)
+            if(!bo_arr.includes(id)){          //checking weather array contain the id
+                bo_arr.push(id);               //adding to array because value doesnt exists
+            }else{
+                bo_arr.splice(bo_arr.indexOf(id), 1);  //deleting
+            }
+            // arr.push(id);
+            console.log(bo_arr , 'sdasd');
+        }
+
+        function pairSellOrder(id) {
+            SOOrderID=id;
+
+            console.log(id);
+            $('.make-bo-pair tbody').html(' ');
+
+            $('.make-bo-pair').DataTable({
+                processing: true,
+                serverSide: true,
+                "bDestroy": true,
+                ajax: {
+                    url:"{{ route('forPairBuyOrders') }}",
+                    data: function (d) {
+                        d.id = "";
+                        d.filter_orders_of = "";
+                    }
+                },
+                columns: [
+                    {data: 'sell_checkbox', name: 'sell_checkbox'},
+                    {data: 'contact', name: 'contact'},
+                    {data: 'estsize', name: 'estsize'},
+                    {data: 'pps', name: 'pps'},
+                    {data: 'valuation', name: 'valuation'},
+                ]
+            });
+        }
+
+        $("#pairSellOrder").click(function () {
+            console.log(bo_arr)
             $.ajax({
                 type: "POST",
-                url: "{{url('pair-buy-order')}}",
+                url: "{{url('pair-sell-order')}}",
                 data: {
                     "_token": "{{csrf_token()}}",
-                    "sell_orders":so_arr,
-                    "buy_order":BuyOrderID,
-                    {{--"company_id":"{{$active_company->company_id}}",--}}
-                    "comment":$('#pair_bo_comment').val()
+                    "buy_orders":bo_arr,
+                    "sell_order":SOOrderID,
+                    "company_id":"0",
+                    "comment":$('#pair_so_comment').val()
                 },
                 success: function (result) {
                     if (result.status) {
@@ -492,6 +532,7 @@
                 }
             });
         });
+
 
     </script>
 

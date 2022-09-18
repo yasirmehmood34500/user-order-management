@@ -6,6 +6,8 @@ use App\Models\Business;
 use App\Models\BuyOrder;
 use App\Models\Company;
 use App\Models\Location;
+use App\Models\matching;
+use App\Models\Pair;
 use App\Models\Sector;
 use App\Models\SellOrder;
 use App\Models\User;
@@ -66,6 +68,11 @@ class SellOrderController extends Controller
             }
             return Datatables::of($data)
                 ->addIndexColumn()
+                ->addColumn('sell_id', function($row){
+                    $data = '<i class="fa-solid fa-code-merge text-danger font-weight-bold cursor-pointer p-1" style="background-color: #dde1e5;" data-toggle="modal"
+                        data-target="#pairSOModal" onclick="pairSellOrder('.$row->sell_id.')"></i>'.$row->sell_id;
+                    return $data;
+                })
                 ->addColumn('contact', function($row){
                     $data = $row->Contact ? $row->Contact->name:'N/A';
                     return $data;
@@ -79,7 +86,7 @@ class SellOrderController extends Controller
 //                        data-target="#editSOModal" onclick="getSO_ID('.$row->sell_id.')">Edit</a>';
                     return $btn;
                 })
-                ->rawColumns(['action'])
+                ->rawColumns(['action','sell_id'])
                 ->make(true);
         }
     }
@@ -113,6 +120,23 @@ class SellOrderController extends Controller
                 ->rawColumns(['sell_checkbox'])
                 ->make(true);
         }
+    }
+
+    public function pair(Request $request){
+//        dd($request);
+        $pair = Pair::create([
+            'comment'=>$request->comment
+        ]);
+        foreach ($request->buy_orders as $buy_id){
+            matching::create([
+                'sell_id'=>$request->sell_order,
+                'company_id'=>$request->company_id,
+                'buy_id'=>$buy_id,
+                'pair_id'=>$pair->id
+            ]);
+        }
+
+        return response()->json(['status' => true, 'message' => 'Sell Order Paired']);
     }
     /**
      * Show the form for creating a new resource.

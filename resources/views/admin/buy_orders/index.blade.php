@@ -39,6 +39,41 @@
         </div>
     </div>
 
+    <!--Pair Order Modal -->
+    <div class="modal fade" id="pairBuyModal" tabindex="-1" role="dialog"
+         aria-labelledby="pairBuyModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pairBuyModalLabel">Sell Orders</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered make-so-pair">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Contact</th>
+                            <th>Est Size</th>
+                            <th>PPS</th>
+                            <th>Valuation</th>
+                        </tr>
+                        </thead>
+                    </table>
+                    <div class="form-group">
+                        <label for="pair_bo_comment">Comments</label>
+                        <textarea name="pair_bo_comment" class="form-control" id="pair_bo_comment"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="pairBuyOrder">Pair Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @push('js')
     <script type="text/javascript">
@@ -72,6 +107,63 @@
 
         });
         </script>
+    <script>
+        let so_arr=[];
+        function selectSO(id){
+            if(!so_arr.includes(id)){          //checking weather array contain the id
+                so_arr.push(id);               //adding to array because value doesnt exists
+            }else{
+                so_arr.splice(so_arr.indexOf(id), 1);  //deleting
+            }
+            // arr.push(id);
+            console.log(so_arr);
+        }
+        function pairOrder(id) {
+            BuyOrderID=id;
+            console.log(id);
+            $('.make-so-pair tbody').html(' ');
+
+            $('.make-so-pair').DataTable({
+                processing: true,
+                serverSide: true,
+                "bDestroy": true,
+                ajax: {
+                    url:"{{ route('forPairSellOrders') }}",
+                    data: function (d) {
+                        d.id = "";
+                        d.filter_orders_of = "";
+                    }
+                },
+                columns: [
+                    {data: 'sell_checkbox', name: 'sell_checkbox'},
+                    {data: 'contact', name: 'contact'},
+                    {data: 'estsize', name: 'estsize'},
+                    {data: 'pps', name: 'pps'},
+                    {data: 'valuation', name: 'valuation'},
+                ]
+            });
+        }
+        $("#pairBuyOrder").click(function () {
+            $.ajax({
+                type: "POST",
+                url: "{{url('pair-buy-order')}}",
+                data: {
+                    "_token": "{{csrf_token()}}",
+                    "sell_orders":so_arr,
+                    "buy_order":BuyOrderID,
+                    "company_id":"0",
+                    "comment":$('#pair_bo_comment').val()
+                },
+                success: function (result) {
+                    if (result.status) {
+                        alert(result.message);
+                        window.location.reload();
+                    }
+                }
+            });
+        });
+
+    </script>
     <script>
         function exportTableToCSV(filename) {
             var csv = [];

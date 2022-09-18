@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 12, 2022 at 08:13 PM
+-- Generation Time: Sep 17, 2022 at 10:32 PM
 -- Server version: 10.4.22-MariaDB
 -- PHP Version: 8.1.2
 
@@ -200,6 +200,15 @@ CREATE TABLE `holding` (
   `comments` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Dumping data for table `holding`
+--
+
+INSERT INTO `holding` (`holding_id`, `company_id`, `user_id`, `holding`, `pps`, `target`, `shareclass`, `comments`) VALUES
+(1, 1, 2, 9, '9.00', 9, 'Common', 'jkjk'),
+(2, 4, 1, 9, '9.00', 9, 'Common', 'jhjhjh'),
+(3, 1, 1, NULL, NULL, NULL, 'Common', NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -244,7 +253,13 @@ CREATE TABLE `matching` (
 INSERT INTO `matching` (`match_id`, `company_id`, `buy_id`, `sell_id`, `estsize`, `pps`, `pair_id`) VALUES
 (1, 6, 3, 1, NULL, NULL, 4),
 (2, 6, 2, 1, NULL, NULL, 5),
-(3, 6, 2, 2, NULL, NULL, 5);
+(3, 6, 2, 2, NULL, NULL, 5),
+(5, 1, 4, 3, NULL, NULL, 11),
+(6, 1, 4, 3, NULL, NULL, 12),
+(7, 0, 1, 3, NULL, NULL, 13),
+(8, 0, 3, 3, NULL, NULL, 13),
+(9, 0, 3, 1, NULL, NULL, 15),
+(10, 0, 3, 3, NULL, NULL, 15);
 
 -- --------------------------------------------------------
 
@@ -322,7 +337,11 @@ CREATE TABLE `pairs` (
 --
 
 INSERT INTO `pairs` (`id`, `comment`, `created_at`, `updated_at`) VALUES
-(5, 'sdasds', '2022-09-12 09:36:10', '2022-09-12 09:36:10');
+(5, 'sdasds', '2022-09-12 09:36:10', '2022-09-12 09:36:10'),
+(11, NULL, '2022-09-17 13:35:57', '2022-09-17 13:35:57'),
+(12, NULL, '2022-09-17 13:36:23', '2022-09-17 13:36:23'),
+(13, NULL, '2022-09-17 14:04:30', '2022-09-17 14:04:30'),
+(15, 'klkl', '2022-09-17 14:07:43', '2022-09-17 14:07:43');
 
 -- --------------------------------------------------------
 
@@ -501,7 +520,7 @@ CREATE TABLE `sellorder` (
 --
 
 INSERT INTO `sellorder` (`sell_id`, `user_id`, `company_id`, `estsize`, `pps`, `valuation`, `shareclass`, `structure`, `comments`, `status_id`, `category_id`) VALUES
-(1, 2, 6, 90, '120.00', 90, 'Ordinary', 'Direct Shares', 'uiuiui', NULL, NULL),
+(1, 2, NULL, 90, '120.00', 91, 'Ordinary', 'Direct Shares', 'uiuiui', NULL, NULL),
 (2, 2, 6, 80, '70.00', 70, 'Preferred', 'Direct Shares', 'JOB', NULL, NULL),
 (3, 1, 1, 8, '77.00', 60, 'Preferred', 'Direct Shares', 'Teest', NULL, NULL);
 
@@ -569,6 +588,13 @@ CREATE TABLE `target` (
   `estsize` int(11) NOT NULL,
   `pps` decimal(12,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `target`
+--
+
+INSERT INTO `target` (`target_id`, `user_id`, `company_id`, `estsize`, `pps`) VALUES
+(1, 1, 1, 89, '89.00');
 
 -- --------------------------------------------------------
 
@@ -835,7 +861,7 @@ ALTER TABLE `geogcover`
 -- AUTO_INCREMENT for table `holding`
 --
 ALTER TABLE `holding`
-  MODIFY `holding_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `holding_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `layers`
@@ -847,7 +873,7 @@ ALTER TABLE `layers`
 -- AUTO_INCREMENT for table `matching`
 --
 ALTER TABLE `matching`
-  MODIFY `match_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `match_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `migrations`
@@ -859,7 +885,7 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT for table `pairs`
 --
 ALTER TABLE `pairs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `permissions`
@@ -919,7 +945,7 @@ ALTER TABLE `structure`
 -- AUTO_INCREMENT for table `target`
 --
 ALTER TABLE `target`
-  MODIFY `target_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `target_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `usercategory`

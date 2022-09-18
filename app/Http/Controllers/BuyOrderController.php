@@ -41,7 +41,7 @@ class BuyOrderController extends Controller
 
                 ->addColumn('buy_id', function($row){
                     $data = '<i class="fa-solid fa-code-merge text-danger font-weight-bold cursor-pointer p-1" style="background-color: #dde1e5;" data-toggle="modal"
-                        data-target="#pairBuyModal" onclick="pairOrder('.$row->buy_id.')"></i>'.$row->buy_id;
+                        data-target="#pairBuyModal" onclick="pairOrder('.$row->buy_id.')"></i>'. $row->buy_id;
                     return $data;
                 })
                 ->addColumn('contact', function($row){
@@ -62,6 +62,36 @@ class BuyOrderController extends Controller
         }
     }
 
+    public function forPairBuyOrders(Request $request){
+
+        if ($request->ajax()) {
+            if (auth()->user()->hasRole('Admin')) {
+                if ($request->filter_orders_of == 'company') {
+                    $data = BuyOrder::query()->with(['Contact', 'Company'])->where('company_id',$request->id)->get();
+                }else if ($request->filter_orders_of == 'contacts'){
+                    $data = BuyOrder::query()->with(['Contact', 'Company'])->where('user_id',$request->id)->get();
+                }else{
+                    $data = BuyOrder::query()->with(['Contact', 'Company'])->get();
+                }
+            }else{
+                $data = BuyOrder::query()->where('user_id',Auth::id())->get();
+            }
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('contact', function($row){
+                    $data = $row->Contact ? $row->Contact->name:'N/A';
+                    return $data;
+                })->addColumn('company', function($row){
+                    $data = $row->Company ? $row->Company->comp_name:'N/A';
+                    return $data;
+                })->addColumn('sell_checkbox', function($row){
+                    $btn = '<input type="checkbox" class="sell_checkbox" onclick="selectBO('.$row->buy_id.')"/>';
+                    return $btn;
+                })
+                ->rawColumns(['sell_checkbox'])
+                ->make(true);
+        }
+    }
 
     /**
      * Show the form for creating a new resource.

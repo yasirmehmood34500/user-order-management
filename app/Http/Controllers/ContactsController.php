@@ -20,7 +20,7 @@ class ContactsController extends Controller
 
     public function index()
     {
-        $users = User::with(['Location','Sector'])->get();
+        $users = User::with(['Location','Sector'])->orderBy('name',"ASC")->get();
         $sectors = Sector::all();
         $business = Business::all();
         $locations = Location::all();
@@ -56,6 +56,11 @@ class ContactsController extends Controller
 
     public function store(Request $request)
     {
+        $this->validate($request,[
+           'email'=>'required|unique:users,email',
+           'password'=>'required',
+           'name'=>'required',
+        ]);
         $user =  User::create([
             "name" => $request->user_name,
             "geog_id" => $request->location,

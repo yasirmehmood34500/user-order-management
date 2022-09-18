@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Business;
 use App\Models\Company;
 use App\Models\Location;
+use App\Models\Pair;
 use App\Models\Sector;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ class CompanyController extends Controller
 
     public function index()
     {
-        $companies = Company::all();
+        $companies = Company::orderBy('comp_name','ASC')->get();
         $sectors = Sector::all();
         $business = Business::all();
         $locations = Location::all();
@@ -31,6 +32,26 @@ class CompanyController extends Controller
         } else {
             $activeCompany = $companies[0];
         }
+
+        if (\request('search_pair')){
+            $pairs = Pair::with(['matchings.SaleOrder.Contact', 'matchings.BuyOrder.Contact'])
+                ->whereHas('matchings',function ($q){
+                    $q->whereHas('SaleOrder',function ($sq){
+                        $sq->whereHas('Contact',function ($sq_contact){
+                            $sq_contact->where('name',\request('search'));
+                        });
+                    })->orwhereHas('BuyOrder',function ($sq){
+                        $sq->whereHas('Contact',function ($sq_contact){
+                            $sq_contact->where('name',\request('search'));
+                        });
+                    });
+                })->paginate(50);
+
+        }else{
+            $pairs = Pair::with(['matchings.SaleOrder.Contact', 'matchings.BuyOrder.Contact'])->paginate(50);
+
+        }
+
         $data = [
             'all_companies'=>$companies,
             'sectors'=>$sectors,
@@ -40,8 +61,10 @@ class CompanyController extends Controller
             'share_classes'=>$share_classes,
             'categories'=>$categories,
             'structures'=>$structures,
-            'contacts'=>$users
+            'contacts'=>$users,
+            'pairs'=>$pairs
         ];
+
         return view('admin.companies.index',$data);
     }
 

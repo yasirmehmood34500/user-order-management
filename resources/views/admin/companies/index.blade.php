@@ -39,7 +39,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
-                    <p>{{$active_company->comp_name}}</p>
+                    <p>Company Details</p>
                     <button type="button" id="editButton" class="text-muted btn btn-muted" data-toggle="modal"
                             data-target="#editCompanyModal">
                         Edit
@@ -87,7 +87,8 @@
                         <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Contact</th>
+                            <th>Company</th>
+                            <th>User Profile</th>
                             <th>Est Size</th>
                             <th>PPS</th>
                             <th>Valuation</th>
@@ -95,7 +96,7 @@
                             <th>Structure</th>
                             @if(auth()->user()->hasRole('Admin'))
                             <th>comment</th>
-                            <th width="100px">Action</th>
+                            <th>Action</th>
                             @endif
                         </tr>
                         </thead>
@@ -105,7 +106,7 @@
         </div>
     </div>
 
-    <div class="row justify-content-center ">
+    <div class="row justify-content-center mb-5">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
@@ -121,7 +122,8 @@
                         <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Contact</th>
+                            <th>Company</th>
+                            <th>User Profile</th>
                             <th>Est Size</th>
                             <th>PPS</th>
                             <th>Valuation</th>
@@ -129,11 +131,170 @@
                             <th>Structure</th>
                             @if(auth()->user()->hasRole('Admin'))
                                 <th>comment</th>
-                                <th width="100px">Action</th>
+                                <th >Action</th>
                             @endif
                         </tr>
                         </thead>
                     </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    @if(auth()->user()->hasRole('Admin'))
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-12">
+            <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <p>{{ __('Paired Orders') }}</p>
+            <form action="{{url('companies')}}" class="d-flex">
+                <input type="search" name="search_pair" placeholder="search" class="form-control input-group-sm" value="{{request('search_pair')}}">
+                <button class="btn btn-primary ml-1 btn-sm">Search</button>
+            </form>
+        </div>
+
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Contacts (SO - PO)</th>
+                    <th>EST Size (SO - PO)</th>
+                    <th>PPS  (SO - PO)</th>
+                    <th>Valuation  (SO - PO)</th>
+                    <th>Pair Comment</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($pairs as $index=>$pair)
+                    <tr>
+                        <td>{{$index+1}}</td>
+                        <td>
+                            @foreach($pair->Matchings as $matching)
+                                <p>{{$matching->SaleOrder->Contact ? $matching->SaleOrder->Contact->name : 'N/A'}} - {{$matching->SaleOrder->Contact ? $matching->BuyOrder->Contact->name : 'N/A'}}</p>
+                            @endforeach
+                        </td>
+                        <td>
+                            @foreach($pair->Matchings as $matching)
+                                <p>{{$matching->SaleOrder->est_size ? $matching->SaleOrder->est_size : 'N/A'}} - {{$matching->SaleOrder->est_size ? $matching->BuyOrder->est_size : 'N/A'}}</p>
+                            @endforeach
+                        </td>
+                        <td>
+                            @foreach($pair->Matchings as $matching)
+                                <p>{{$matching->SaleOrder->pps ? $matching->SaleOrder->pps : 'N/A'}} - {{$matching->SaleOrder->pps ? $matching->BuyOrder->pps : 'N/A'}}</p>
+                            @endforeach
+                        </td>
+                        <td>
+                            @foreach($pair->Matchings as $matching)
+                                <p>{{$matching->SaleOrder->valuation ? $matching->SaleOrder->valuation : 'N/A'}} - {{$matching->SaleOrder->valuation ? $matching->BuyOrder->valuation : 'N/A'}}</p>
+                            @endforeach
+                        </td>
+                        <td>
+                            {{$pair->comment}}
+                        </td>
+                        <td>
+                            <a href="{{url('paired_order_delete').'/'.$pair->id}}" class="btn btn-danger btn-sm"> Delete</a>
+                        </td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+
+            <div class="d-flex justify-content-between" style="float: right">
+                {{$pairs->links('pagination::bootstrap-4')}}
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+    @endif
+
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <p>Current Holdings</p>
+                    <button type="button" id="buy_order" class="text-muted btn btn-muted" data-toggle="modal"
+                            data-target="#addHoldModal">
+                        Add New
+                    </button>
+                </div>
+
+                <div class="card-body">
+                    <table class="table table-bordered holdings">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Company</th>
+                            <th>User Profile</th>
+                            <th>holding</th>
+                            <th>target</th>
+                            <th>PPS</th>
+                            <th>shareclass</th>
+                            @if(auth()->user()->hasRole('Admin'))
+                                <th>comments</th>
+                            @endif
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Add  Hold Modal = -->
+    <div class="modal fade" id="addHoldModal" tabindex="-1" role="dialog"
+         aria-labelledby="addHoldModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addHoldModalLabel">Add Holding</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <input type="hidden" id="company_id" value="{{$active_company->company_id}}">
+                        <div class="col-md-6 form-group">
+                            <label for="hold_contact">Contacts</label>
+                            <select name="hold_contact" id="hold_contact" class="form-control">
+                                @foreach($contacts as $contact)
+                                    <option value="{{$contact->id}}">{{$contact->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="holding">Holding</label>
+                            <input type="number" class="form-control" id="holding">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="hold_pps">PPS</label>
+                            <input type="number" class="form-control" id="hold_pps">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="hold_target">Target</label>
+                            <input type="number" class="form-control" id="hold_target">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="hold_share_class">Share Class</label>
+                            <select name="hold_share_class" id="hold_share_class" class="form-control">
+                                @foreach($share_classes as $share_class)
+                                    <option value="{{$share_class->classname}}">{{$share_class->classname}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @if(auth()->user()->hasRole('Admin'))
+                            <div class="col-md-6 form-group">
+                                <label for="hold_comment">Comments</label>
+                                <textarea name="hold_comment" class="form-control" id="hold_comment"></textarea>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveHold">Save changes</button>
                 </div>
             </div>
         </div>
@@ -578,7 +739,7 @@
         </div>
     </div>
 
-    <!--Pair Order Modal -->
+    <!--Pair Buy Order Modal -->
     <div class="modal fade" id="pairBuyModal" tabindex="-1" role="dialog"
          aria-labelledby="pairBuyModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -613,6 +774,41 @@
             </div>
         </div>
     </div>
+    <!--Pair SO Order Modal -->
+    <div class="modal fade" id="pairSOModal" tabindex="-1" role="dialog"
+         aria-labelledby="pairSOModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pairSOModalLabel">Buy Orders</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered make-bo-pair">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Contact</th>
+                                <th>Est Size</th>
+                                <th>PPS</th>
+                                <th>Valuation</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <div class="form-group">
+                        <label for="pair_so_comment">Comments</label>
+                        <textarea name="pair_so_comment" class="form-control" id="pair_so_comment"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="pairSellOrder">Pair Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('js')
@@ -631,6 +827,7 @@
                 },
                 columns: [
                     {data: 'buy_id', name: 'buy_id'},
+                    {data: 'company', name: 'company'},
                     {data: 'contact', name: 'contact'},
                     {data: 'estsize', name: 'estsize'},
                     {data: 'pps', name: 'pps'},
@@ -659,6 +856,7 @@
                 },
                 columns: [
                     {data: 'sell_id', name: 'sell_id'},
+                    {data: 'company', name: 'company'},
                     {data: 'contact', name: 'contact'},
                     {data: 'estsize', name: 'estsize'},
                     {data: 'pps', name: 'pps'},
@@ -671,7 +869,29 @@
                     @endif
                 ]
             });
-
+            $('.holdings').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url:"{{ route('current-holdings.getHoldings') }}",
+                    data: function (d) {
+                        d.id = "{{$active_company->company_id}}";
+                        d.filter_orders_of = "company";
+                    }
+                },
+                columns: [
+                    {data: 'holding_id', name: 'holding_id'},
+                    {data: 'company', name: 'company'},
+                    {data: 'contact', name: 'contact'},
+                    {data: 'holding', name: 'holding'},
+                    {data: 'target', name: 'target'},
+                    {data: 'pps', name: 'pps'},
+                    {data: 'shareclass', name: 'shareclass'},
+                        @if(auth()->user()->hasRole('Admin'))
+                    {data: 'comments', name: 'comments'}
+                    @endif
+                ]
+            });
         });
     </script>
     <script>
@@ -802,14 +1022,45 @@
                 }
             });
         });
+
         function pairOrder(id) {
             BuyOrderID=id;
             console.log(id);
+            $('.make-so-pair tbody').html(' ');
+
             $('.make-so-pair').DataTable({
                 processing: true,
                 serverSide: true,
+                "bDestroy": true,
                 ajax: {
                     url:"{{ route('forPairSellOrders') }}",
+                    data: function (d) {
+                        d.id = "{{$active_company->company_id}}";
+                        d.filter_orders_of = "company";
+                    }
+                },
+                columns: [
+                    {data: 'sell_checkbox', name: 'sell_checkbox'},
+                    {data: 'contact', name: 'contact'},
+                    {data: 'estsize', name: 'estsize'},
+                    {data: 'pps', name: 'pps'},
+                    {data: 'valuation', name: 'valuation'},
+                ]
+            });
+        }
+
+        function pairSellOrder(id) {
+            SOOrderID=id;
+
+            console.log(id);
+            $('.make-bo-pair tbody').html(' ');
+
+            $('.make-bo-pair').DataTable({
+                processing: true,
+                serverSide: true,
+                "bDestroy": true,
+                ajax: {
+                    url:"{{ route('forPairBuyOrders') }}",
                     data: function (d) {
                         d.id = "{{$active_company->company_id}}";
                         d.filter_orders_of = "company";
@@ -829,10 +1080,21 @@
             if(!so_arr.includes(id)){          //checking weather array contain the id
                 so_arr.push(id);               //adding to array because value doesnt exists
             }else{
-                so_arr.splice(arr.indexOf(id), 1);  //deleting
+                so_arr.splice(so_arr.indexOf(id), 1);  //deleting
             }
             // arr.push(id);
             console.log(so_arr);
+        }
+        let bo_arr=[];
+        function selectBO(id){
+            console.log(id)
+            if(!bo_arr.includes(id)){          //checking weather array contain the id
+                bo_arr.push(id);               //adding to array because value doesnt exists
+            }else{
+                bo_arr.splice(bo_arr.indexOf(id), 1);  //deleting
+            }
+            // arr.push(id);
+            console.log(bo_arr , 'sdasd');
         }
     </script>
     <script>
@@ -929,7 +1191,49 @@
                 }
             });
         });
+        $("#pairSellOrder").click(function () {
+        console.log(bo_arr)
+            $.ajax({
+                type: "POST",
+                url: "{{url('pair-sell-order')}}",
+                data: {
+                    "_token": "{{csrf_token()}}",
+                    "buy_orders":bo_arr,
+                    "sell_order":SOOrderID,
+                    "company_id":"{{$active_company->company_id}}",
+                    "comment":$('#pair_so_comment').val()
+                },
+                success: function (result) {
+                    if (result.status) {
+                        alert(result.message);
+                        window.location.reload();
+                    }
+                }
+            });
+        });
 
+        $('#saveHold').click(function () {
+            $.ajax({
+                type: "POST",
+                url: "{{url('save-holding')}}",
+                data: {
+                    "_token": "{{csrf_token()}}",
+                    "hold_contact":$('#hold_contact').val(),
+                    "holding":$('#holding').val(),
+                    "hold_pps":$('#hold_pps').val(),
+                    "hold_target":$('#hold_target').val(),
+                    "hold_share_class":$('#hold_share_class').val(),
+                    "hold_comment":$('#hold_comment').val(),
+                    "company_id":"{{$active_company->company_id}}"
+                },
+                success: function (result) {
+                    if (result.status) {
+                        alert(result.message);
+                        window.location.reload();
+                    }
+                }
+            });
+        })
     </script>
     <!-- Search code -->
     <script>

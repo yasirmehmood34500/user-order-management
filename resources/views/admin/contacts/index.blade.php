@@ -5,7 +5,8 @@
 @section('search')
     <div class="gull-brand mt-3 p-2">
         <hr style="margin-top:0 !important;">
-        <input type="search" class="form-control live-search-box" name="search" id="search" placeholder="Search" >
+        <input type="password" class="d-none">
+        <input type="search" class="form-control live-search-box" name="search" id="search" placeholder="Search"  >
         <!--  <span class=" item-name text-20 text-primary font-weight-700">GULL</span> -->
     </div>
 @endsection
@@ -32,6 +33,11 @@
 @endsection
 
 @section('content')
+    <style>
+        .fa-code-merge{
+            display: none !important;
+        }
+    </style>
     <div class="row justify-content-center mb-5">
         <div class="col-md-12">
             <div class="card">
@@ -83,7 +89,8 @@
                         <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Contact</th>
+                            <th>Company</th>
+                            <th>User Profile</th>
                             <th>Est Size</th>
                             <th>PPS</th>
                             <th>Valuation</th>
@@ -101,7 +108,7 @@
         </div>
     </div>
 
-    <div class="row justify-content-center ">
+    <div class="row justify-content-center mb-5">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
@@ -117,7 +124,8 @@
                         <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Contact</th>
+                            <th>Company</th>
+                            <th>User Profile</th>
                             <th>Est Size</th>
                             <th>PPS</th>
                             <th>Valuation</th>
@@ -134,6 +142,164 @@
             </div>
         </div>
     </div>
+
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <p>Current Holdings</p>
+                    <button type="button" id="buy_order" class="text-muted btn btn-muted" data-toggle="modal"
+                            data-target="#addHoldModal">
+                        Add New
+                    </button>
+                </div>
+
+                <div class="card-body">
+                    <table class="table table-bordered holdings">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Company</th>
+                            <th>User Profile</th>
+                            <th>holding</th>
+                            <th>target</th>
+                            <th>PPS</th>
+                            <th>shareclass</th>
+                            @if(auth()->user()->hasRole('Admin'))
+                                <th>comments</th>
+                            @endif
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <p>Targets</p>
+                    <button type="button" id="buy_order" class="text-muted btn btn-muted" data-toggle="modal"
+                            data-target="#addTargetModal">
+                        Add New
+                    </button>
+                </div>
+
+                <div class="card-body">
+                    <table class="table table-bordered acq_targets">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Company</th>
+                                <th>User Profile</th>
+                                <th>EST Size</th>
+                                <th>PPS</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Add  acq_targets Modal = -->
+    <div class="modal fade" id="addTargetModal" tabindex="-1" role="dialog"
+         aria-labelledby="addTargetModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTargetModalLabel">Add Target</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="company_hold">Company</label>
+                            <select name="company_hold" id="company_acq" class="form-control">
+                                @foreach($companies as $company)
+                                    <option value="{{$company->company_id}}">{{$company->comp_name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="est_size_acq">EST Size</label>
+                            <input type="number" class="form-control" id="est_size_acq">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="pps_acq">PPS</label>
+                            <input type="number" class="form-control" id="pps_acq">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveAcqTarget">Save Target</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Add  Hold Modal = -->
+    <div class="modal fade" id="addHoldModal" tabindex="-1" role="dialog"
+         aria-labelledby="addHoldModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addHoldModalLabel">Add Holding</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="company_hold">Company</label>
+                            <select name="company_hold" id="company_hold" class="form-control">
+                                @foreach($companies as $company)
+                                    <option value="{{$company->company_id}}">{{$company->comp_name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="holding">Holding</label>
+                            <input type="number" class="form-control" id="holding">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="hold_pps">PPS</label>
+                            <input type="number" class="form-control" id="hold_pps">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="hold_target">Target</label>
+                            <input type="number" class="form-control" id="hold_target">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="hold_share_class">Share Class</label>
+                            <select name="hold_share_class" id="hold_share_class" class="form-control">
+                                @foreach($share_classes as $share_class)
+                                    <option value="{{$share_class->classname}}">{{$share_class->classname}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @if(auth()->user()->hasRole('Admin'))
+                            <div class="col-md-6 form-group">
+                                <label for="hold_comment">Comments</label>
+                                <textarea name="hold_comment" class="form-control" id="hold_comment"></textarea>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveHold">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!--Add Modal -->
     <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog"
          aria-labelledby="addUserModalLabel" aria-hidden="true">
@@ -601,6 +767,7 @@
                 columns: [
                     {data: 'buy_id', name: 'buy_id'},
                     {data: 'company', name: 'company'},
+                    {data: 'contact', name: 'contact'},
                     {data: 'estsize', name: 'estsize'},
                     {data: 'pps', name: 'pps'},
                     {data: 'valuation', name: 'valuation'},
@@ -629,6 +796,7 @@
                 columns: [
                     {data: 'sell_id', name: 'sell_id'},
                     {data: 'company', name: 'company'},
+                    {data: 'contact', name: 'contact'},
                     {data: 'estsize', name: 'estsize'},
                     {data: 'pps', name: 'pps'},
                     {data: 'valuation', name: 'valuation'},
@@ -640,7 +808,46 @@
                     @endif
                 ]
             });
-
+            $('.holdings').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url:"{{ route('current-holdings.getHoldings') }}",
+                    data: function (d) {
+                        d.id = "{{$active_user->id}}";
+                        d.filter_orders_of = "contacts";
+                    }
+                },
+                columns: [
+                    {data: 'holding_id', name: 'holding_id'},
+                    {data: 'company', name: 'company'},
+                    {data: 'contact', name: 'contact'},
+                    {data: 'holding', name: 'holding'},
+                    {data: 'target', name: 'target'},
+                    {data: 'pps', name: 'pps'},
+                    {data: 'shareclass', name: 'shareclass'},
+                        @if(auth()->user()->hasRole('Admin'))
+                    {data: 'comments', name: 'comments'}
+                    @endif
+                ]
+            });
+            $('.acq_targets').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url:"{{ route('getTargets') }}",
+                    data: function (d) {
+                        d.id = "{{$active_user->id}}";
+                    }
+                },
+                columns: [
+                    {data: 'target_id', name: 'target_id'},
+                    {data: 'company', name: 'company'},
+                    {data: 'contact', name: 'contact'},
+                    {data: 'estsize', name: 'estsize'},
+                    {data: 'pps', name: 'pps'},
+                ]
+            });
         });
     </script>
 
@@ -665,7 +872,12 @@
                         alert(result.message);
                         window.location.reload();
                     }
-                }
+                },
+                error: function (err) {
+                    $.each(err.responseJSON.errors, function (key, value) {
+                        alert(value[0]);
+                    });
+                },
             });
         });
         $("#editButton").click(function () {
@@ -902,6 +1114,48 @@
                 }
             });
         });
+        $('#saveHold').click(function () {
+            $.ajax({
+                type: "POST",
+                url: "{{url('save-holding')}}",
+                data: {
+                    "_token": "{{csrf_token()}}",
+                    "hold_contact":"{{$active_user->id}}",
+                    "holding":$('#holding').val(),
+                    "hold_pps":$('#hold_pps').val(),
+                    "hold_target":$('#hold_target').val(),
+                    "hold_share_class":$('#hold_share_class').val(),
+                    "hold_comment":$('#hold_comment').val(),
+                    "company_id":$('#company_hold').val()
+                },
+                success: function (result) {
+                    if (result.status) {
+                        alert(result.message);
+                        window.location.reload();
+                    }
+                }
+            });
+        })
+
+        $('#saveAcqTarget').click(function () {
+            $.ajax({
+                type: "POST",
+                url: "{{url('save-acq-target')}}",
+                data: {
+                    "_token": "{{csrf_token()}}",
+                    "contact_acq":"{{$active_user->id}}",
+                    "company_acq":$('#company_acq').val(),
+                    "est_size_acq":$('#est_size_acq').val(),
+                    "pps_acq":$('#pps_acq').val(),
+                },
+                success: function (result) {
+                    if (result.status) {
+                        alert(result.message);
+                        window.location.reload();
+                    }
+                }
+            });
+        })
 
     </script>
     <!-- Search code -->
