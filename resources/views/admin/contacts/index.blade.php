@@ -15,19 +15,21 @@
     <div class="main-menu">
         <ul class="metismenu live-search-list" id="menu">
             @foreach($users as $user)
-                <li class="Ul_li--hover">
+                <li class="Ul_li--hover {{request('search') == $user->id ? 'active' : ''}}">
                     <!-- User Name -->
                     <a href="{{url('contacts?search=').$user->id}}">
                         <span class="item-name text-15 text-muted">{{$user->name}}</span>
                     </a>
                 </li>
             @endforeach
+            @if(auth()->user()->hasRole('Admin'))
             <div class="Ul_li--hover text-center">
                 <button type="button" class="text-muted btn btn-muted" data-toggle="modal"
                         data-target="#addUserModal">
                     +
                 </button>
             </div>
+            @endif
         </ul>
     </div>
 @endsection

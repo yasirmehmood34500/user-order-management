@@ -291,10 +291,6 @@
                             <input type="number" class="form-control" id="edit_so_price">
                         </div>
                         <div class="col-md-6 form-group">
-                            <label for="so_valuation">Valuation (mn)</label>
-                            <input type="number" class="form-control" id="edit_so_valuation">
-                        </div>
-                        <div class="col-md-6 form-group">
                             <label for="so_est_size">Est Size (.000)</label>
                             <input type="number" class="form-control" id="edit_so_est_size">
                         </div>
@@ -410,7 +406,6 @@
                     {{--"company": "{{$active_company->company_id}}",--}}
                     "category": $('#so_category').val(),
                     "price": $('#so_price').val(),
-                    "valuation": $('#so_valuation').val(),
                     "est_size": $('#so_est_size').val(),
                     "share_class": $('#so_share_class').val(),
                     "structure": $('#so_structure').val(),

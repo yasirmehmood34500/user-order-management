@@ -54,6 +54,9 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/buy-orders', [App\Http\Controllers\BuyOrderController::class, 'index'])->name('buy-orders');
     Route::get('/sell-orders', [App\Http\Controllers\SellOrderController::class, 'index'])->name('sell-orders');
     Route::get('/paired-order', [App\Http\Controllers\PairedOrderController::class, 'index'])->name('paired-order');
+    Route::post('/delete-matching', [App\Http\Controllers\PairedOrderController::class, 'deleteMatching']);
+    Route::get('/get-paired-order', [App\Http\Controllers\PairedOrderController::class, 'pairOrders'])->name('getPairOrders');
+
     Route::get('paired_order_delete/{id}', [App\Http\Controllers\PairedOrderController::class, 'destroy'])->name('paired-order.destroy');
 
     Route::post('/save-acq-target', [App\Http\Controllers\AcqTargetController::class, 'store'])->name('acquistion-targets.store');

@@ -27,6 +27,7 @@
                             <th>Valuation</th>
                             <th>Share Class</th>
                             <th>Structure</th>
+                            <th>Fee Structure</th>
                             @if(auth()->user()->hasRole('Admin'))
                                 <th>comment</th>
                                 <th width="100px">Action</th>
@@ -74,6 +75,79 @@
             </div>
         </div>
     </div>
+    <!--Buy Order edit Modal -->
+    <div class="modal fade" id="editBuyModal" tabindex="-1" role="dialog"
+         aria-labelledby="editBuyModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editBuyModalLabel">Edit Buy Order Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="contact">Contacts</label>
+                            <select name="contact" id="edit_contact" class="form-control">
+                                @foreach($contacts as $contact)
+                                    <option value="{{$contact->id}}">{{$contact->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="category">Category</label>
+                            <select name="category" id="edit_category" class="form-control">
+                                @foreach($categories as $category)
+                                    <option value="{{$category->category_id}}">{{$category->categoryname}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="price">Price</label>
+                            <input type="number" class="form-control" id="edit_price">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="est_size">Est Size (.000)</label>
+                            <input type="number" class="form-control" id="edit_est_size">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="share_class">Share Class</label>
+                            <select name="share_class" id="edit_share_class" class="form-control">
+                                @foreach($share_classes as $share_class)
+                                    <option value="{{$share_class->classname}}">{{$share_class->classname}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="structure">Structures</label>
+                            <select name="structure" id="edit_structure" class="form-control">
+                                @foreach($structures as $structure)
+                                    <option value="{{$structure->structurename}}">{{$structure->structurename}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @if(auth()->user()->hasRole('Admin'))
+                            <div class="col-md-6 form-group">
+                                <label for="fee_structure">Fee structure</label>
+                                <input type="number" class="form-control" id="edit_fee_structure">
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label for="bo_comment">Comments</label>
+                                <textarea name="bo_comment" class="form-control" id="edit_bo_comment"></textarea>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="updateBuyButton">Save Button</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @push('js')
     <script type="text/javascript">
@@ -98,6 +172,7 @@
                     {data: 'valuation', name: 'valuation'},
                     {data: 'shareclass', name: 'shareclass'},
                     {data: 'structure', name: 'structure'},
+                    {data: 'fee_structure', name: 'fee_structure'},
                         @if(auth()->user()->hasRole('Admin'))
                     {data: 'comments', name: 'comments'},
                     {data: 'action', name: 'action', orderable: false, searchable: false},
@@ -162,7 +237,24 @@
                 }
             });
         });
-
+        function getBuyID(id) {
+            BuyOrderID = id;
+            $.ajax({
+                type: "GET",
+                url: "{{url('edit-buy-order')}}" + "/" + id,
+                success: function (res) {
+                    let result = res.data;
+                    $('#edit_price').val(result.pps);
+                    $('#edit_fee_structure').val(result.fee_structure);
+                    $('#edit_est_size').val(result.estsize);
+                    $('#edit_bo_comment').val(result.comments);
+                    $("#edit_contact option[value=" + result.user_id + "]").prop("selected", true);
+                    $("#edit_category option[value="+result.category_id+"]").prop("selected", true);
+                    $("#edit_share_class option[value="+result.shareclass+"]").prop("selected", true);
+                    $("#edit_structure option[value='"+result.structure+"']").prop("selected", true);
+                }
+            });
+        }
     </script>
     <script>
         function exportTableToCSV(filename) {
@@ -210,5 +302,31 @@
             // Click download link
             downloadLink.click();
         }
+    </script>
+    <script>
+        $("#updateBuyButton").click(function () {
+            $.ajax({
+                type: "POST",
+                url: "{{url('update-buy-order')}}"+"/"+BuyOrderID,
+                data: {
+                    "_token": "{{csrf_token()}}",
+                    "contact": $('#edit_contact').val(),
+                    "company": "{{$active_company->company_id}}",
+                    "category": $('#edit_category').val(),
+                    "price": $('#edit_price').val(),
+                    "fee_structure": $('#edit_fee_structure').val(),
+                    "est_size": $('#edit_est_size').val(),
+                    "share_class": $('#edit_share_class').val(),
+                    "structure": $('#edit_structure').val(),
+                    "bo_comment": $('#edit_bo_comment').val(),
+                },
+                success: function (result) {
+                    if (result.status) {
+                        alert(result.message);
+                        window.location.reload();
+                    }
+                }
+            });
+        });
     </script>
     @endpush

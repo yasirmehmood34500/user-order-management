@@ -69,8 +69,13 @@ class SellOrderController extends Controller
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('sell_id', function($row){
-                    $data = '<i class="fa-solid fa-code-merge text-danger font-weight-bold cursor-pointer p-1" style="background-color: #dde1e5;" data-toggle="modal"
-                        data-target="#pairSOModal" onclick="pairSellOrder('.$row->sell_id.')"></i>'.$row->sell_id;
+                    if (auth()->user()->hasRole('Admin')) {
+                        $pair_icon = '<i class="fa-solid fa-code-merge text-danger fa--customer-icon"  data-toggle="modal"
+                        data-target="#pairSOModal" onclick="pairSellOrder('.$row->sell_id.')"></i>';
+                    }else{
+                        $pair_icon = '';
+                    }
+                        $data = $pair_icon.$row->sell_id;
                     return $data;
                 })
                 ->addColumn('contact', function($row){
@@ -80,7 +85,7 @@ class SellOrderController extends Controller
                     $data = $row->Company ? $row->Company->comp_name:'N/A';
                     return $data;
                 })->addColumn('action', function($row){
-                    $btn = '<i class="fa fa-edit font-weight-bold cursor-pointer p-1" data-toggle="modal"
+                    $btn = '<i class="fa fa-edit fa--customer-icon" data-toggle="modal"
                         data-target="#editSOModal" onclick="getSO_ID('.$row->sell_id.')"></i>';
 //                    $btn = '<a href="javascript:void(0)" class="edit btn btn-primary btn-sm" data-toggle="modal"
 //                        data-target="#editSOModal" onclick="getSO_ID('.$row->sell_id.')">Edit</a>';
@@ -162,7 +167,7 @@ class SellOrderController extends Controller
             'estsize'=>$request->est_size,
             'pps'=>$request->price,
             'shareclass'=>$request->share_class,
-            'valuation'=>$request->valuation,
+            'valuation'=>$request->est_size * $request->price,
             'structure'=>$request->structure,
             'comments'=>$request->bo_comment,
             'category_id'=>$request->category_id,
@@ -214,7 +219,7 @@ class SellOrderController extends Controller
             'estsize'=>$request->est_size,
             'pps'=>$request->price,
             'shareclass'=>$request->share_class,
-            'valuation'=>$request->valuation,
+            'valuation'=>$request->est_size * $request->price,
             'structure'=>$request->structure,
             'comments'=>$request->bo_comment,
             'category_id'=>$request->category_id,

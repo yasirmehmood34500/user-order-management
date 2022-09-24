@@ -14,6 +14,23 @@
     <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"/>
+    <style>
+        .fa--customer-icon{
+            font-size: 14px !important;
+            background-color: #dde1e5;
+            padding: 5px;
+            margin-right: 10px !important;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .active{
+            background: #865eaf;
+
+        }
+        .active a span{
+            color: white !important;
+        }
+    </style>
 </head>
 
 <body class="text-left">

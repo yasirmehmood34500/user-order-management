@@ -15,20 +15,21 @@
     <div class="main-menu">
         <ul class="metismenu live-search-list" id="menu" style="height: 100vh!important; ">
             @foreach($all_companies as $company)
-                <li class="Ul_li--hover">
+                <li class="Ul_li--hover {{request('search') == $company->company_id ? 'active' : ''}}" >
                     <!-- company Name -->
                     <a href="{{url('companies?search=').$company->company_id}}">
                         <span class="item-name text-15 text-muted">{{$company->comp_name}}</span>
                     </a>
                 </li>
             @endforeach
-            <div class="Ul_li--hover text-center">
-                <button type="button" class="text-muted btn btn-muted" data-toggle="modal"
-                        data-target="#addCompanyModal">
-                    +
-                </button>
-            </div>
-
+            @if(auth()->user()->hasRole('Admin'))
+                <div class="Ul_li--hover text-center">
+                    <button type="button" class="text-muted btn btn-muted" data-toggle="modal"
+                            data-target="#addCompanyModal">
+                        +
+                    </button>
+                </div>
+            @endif
         </ul>
     </div>
 @endsection
@@ -38,31 +39,35 @@
     <div class="row justify-content-center mb-5">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header d-flex justify-content-between">
-                    <p>Company Details</p>
-                    <button type="button" id="editButton" class="text-muted btn btn-muted" data-toggle="modal"
-                            data-target="#editCompanyModal">
-                        Edit
-                    </button>
+                <div class="card-header d-flex">
+                    <h4>{{ strtoupper($active_company->comp_name) }}
+                        @if(auth()->user()->hasRole('Admin'))
+                        <i class="fa fa-edit ml-2 fa--customer-icon" id="editButton" data-toggle="modal"
+                           data-target="#editCompanyModal" ></i>
+                            @endif
+                    </h4>
+
+{{--                    <button type="button" id="editButton" class="text-muted btn btn-muted" data-toggle="modal"--}}
+{{--                            data-target="#editCompanyModal">--}}
+{{--                        Edit--}}
+{{--                    </button>--}}
                 </div>
 
                 <div class="card-body">
 
                     <div class="row">
-                        <p class="font-weight-bold col-md-2">Company Name:</p>
-                        <span class="col-md-4">{{ strtoupper($active_company->comp_name) }}</span>
                         <p class="font-weight-bold col-md-2">Invest Stage:</p>
                         <span class="col-md-4">{{ $active_company->invest_stage }}</span>
-                    </div>
-                    <div class="row">
                         <p class="font-weight-bold col-md-2">Location:</p>
                         <span class="col-md-4">{{$active_company->Location ? $active_company->Location->geogarea : 'N/A'}}</span>
-                        <p class="font-weight-bold col-md-2">Sector:</p>
-                        <span class="col-md-4">{{$active_company->Sector ? $active_company->Sector->sectorname :'N/A' }}</span>
                     </div>
                     <div class="row">
                         <p class="font-weight-bold col-md-2">Business:</p>
                         <span class="col-md-4">{{ $active_company->business_id }}</span>
+                        <p class="font-weight-bold col-md-2">Sector:</p>
+                        <span class="col-md-4">{{$active_company->Sector ? $active_company->Sector->sectorname :'N/A' }}</span>
+                    </div>
+                    <div class="row">
                         <p class="font-weight-bold col-md-2">Background:</p>
                         <span class="col-md-4">{{ $active_company->background }}</span>
                     </div>
@@ -87,7 +92,7 @@
                         <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Company</th>
+{{--                            <th>Company</th>--}}
                             <th>User Profile</th>
                             <th>Est Size</th>
                             <th>PPS</th>
@@ -95,6 +100,7 @@
                             <th>Share Class</th>
                             <th>Structure</th>
                             @if(auth()->user()->hasRole('Admin'))
+                            <th>Fee Structure</th>
                             <th>comment</th>
                             <th>Action</th>
                             @endif
@@ -110,8 +116,8 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
-                    <p>Sale Orders</p>
-                    <button type="button" id="buy_order" class="text-muted btn btn-muted" data-toggle="modal"
+                    <p>Sell Orders</p>
+                    <button type="button" id="sell_order" class="text-muted btn btn-muted" data-toggle="modal"
                             data-target="#addSellModal">
                         New Sale Order
                     </button>
@@ -122,7 +128,7 @@
                         <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Company</th>
+{{--                            <th>Company</th>--}}
                             <th>User Profile</th>
                             <th>Est Size</th>
                             <th>PPS</th>
@@ -141,72 +147,35 @@
         </div>
     </div>
     @if(auth()->user()->hasRole('Admin'))
-    <div class="row justify-content-center mb-5">
-        <div class="col-md-12">
-            <div class="card">
-        <div class="card-header d-flex justify-content-between">
-            <p>{{ __('Paired Orders') }}</p>
-            <form action="{{url('companies')}}" class="d-flex">
-                <input type="search" name="search_pair" placeholder="search" class="form-control input-group-sm" value="{{request('search_pair')}}">
-                <button class="btn btn-primary ml-1 btn-sm">Search</button>
-            </form>
-        </div>
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <p>{{ __('Paired Orders') }}</p>
+                    </div>
 
-        <div class="card-body">
-            <table class="table table-bordered">
-                <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Contacts (SO - PO)</th>
-                    <th>EST Size (SO - PO)</th>
-                    <th>PPS  (SO - PO)</th>
-                    <th>Valuation  (SO - PO)</th>
-                    <th>Pair Comment</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach($pairs as $index=>$pair)
-                    <tr>
-                        <td>{{$index+1}}</td>
-                        <td>
-                            @foreach($pair->Matchings as $matching)
-                                <p>{{$matching->SaleOrder->Contact ? $matching->SaleOrder->Contact->name : 'N/A'}} - {{$matching->SaleOrder->Contact ? $matching->BuyOrder->Contact->name : 'N/A'}}</p>
-                            @endforeach
-                        </td>
-                        <td>
-                            @foreach($pair->Matchings as $matching)
-                                <p>{{$matching->SaleOrder->est_size ? $matching->SaleOrder->est_size : 'N/A'}} - {{$matching->SaleOrder->est_size ? $matching->BuyOrder->est_size : 'N/A'}}</p>
-                            @endforeach
-                        </td>
-                        <td>
-                            @foreach($pair->Matchings as $matching)
-                                <p>{{$matching->SaleOrder->pps ? $matching->SaleOrder->pps : 'N/A'}} - {{$matching->SaleOrder->pps ? $matching->BuyOrder->pps : 'N/A'}}</p>
-                            @endforeach
-                        </td>
-                        <td>
-                            @foreach($pair->Matchings as $matching)
-                                <p>{{$matching->SaleOrder->valuation ? $matching->SaleOrder->valuation : 'N/A'}} - {{$matching->SaleOrder->valuation ? $matching->BuyOrder->valuation : 'N/A'}}</p>
-                            @endforeach
-                        </td>
-                        <td>
-                            {{$pair->comment}}
-                        </td>
-                        <td>
-                            <a href="{{url('paired_order_delete').'/'.$pair->id}}" class="btn btn-danger btn-sm"> Delete</a>
-                        </td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
-
-            <div class="d-flex justify-content-between" style="float: right">
-                {{$pairs->links('pagination::bootstrap-4')}}
+                    <div class="card-body">
+                        <table class="table table-bordered" id="paired_orders_table">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Contact</th>
+                                <th>EST Size</th>
+                                <th>PPS</th>
+                                <th>Valuation</th>
+                                <th>Share Class</th>
+                                <th>Structure</th>
+                                @if(auth()->user()->hasRole('Admin'))
+                                    <th>Fee Structure</th>
+                                    <th>Comment</th>
+                                @endif
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-        </div>
-    </div>
     @endif
 
     <div class="row justify-content-center mb-5">
@@ -214,7 +183,7 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
                     <p>Current Holdings</p>
-                    <button type="button" id="buy_order" class="text-muted btn btn-muted" data-toggle="modal"
+                    <button type="button" id="hold_order" class="text-muted btn btn-muted" data-toggle="modal"
                             data-target="#addHoldModal">
                         Add New
                     </button>
@@ -225,7 +194,7 @@
                         <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Company</th>
+{{--                            <th>Company</th>--}}
                             <th>User Profile</th>
                             <th>holding</th>
                             <th>target</th>
@@ -481,10 +450,6 @@
                             <input type="number" class="form-control" id="price">
                         </div>
                         <div class="col-md-6 form-group">
-                            <label for="valuation">Valuation (mn)</label>
-                            <input type="number" class="form-control" id="valuation">
-                        </div>
-                        <div class="col-md-6 form-group">
                             <label for="est_size">Est Size (.000)</label>
                             <input type="number" class="form-control" id="est_size">
                         </div>
@@ -505,6 +470,10 @@
                             </select>
                         </div>
                         @if(auth()->user()->hasRole('Admin'))
+                        <div class="col-md-6 form-group">
+                            <label for="fee_structure">Fee structure </label>
+                            <input type="number" class="form-control" id="fee_structure">
+                        </div>
                         <div class="col-md-6 form-group">
                             <label for="bo_comment">Comments</label>
                             <textarea name="bo_comment" class="form-control" id="bo_comment"></textarea>
@@ -553,10 +522,7 @@
                             <label for="price">Price</label>
                             <input type="number" class="form-control" id="edit_price">
                         </div>
-                        <div class="col-md-6 form-group">
-                            <label for="valuation">Valuation (mn)</label>
-                            <input type="number" class="form-control" id="edit_valuation">
-                        </div>
+
                         <div class="col-md-6 form-group">
                             <label for="est_size">Est Size (.000)</label>
                             <input type="number" class="form-control" id="edit_est_size">
@@ -578,6 +544,10 @@
                             </select>
                         </div>
                         @if(auth()->user()->hasRole('Admin'))
+                        <div class="col-md-6 form-group">
+                            <label for="fee_structure">Fee structure</label>
+                            <input type="number" class="form-control" id="edit_fee_structure">
+                        </div>
                         <div class="col-md-6 form-group">
                             <label for="bo_comment">Comments</label>
                             <textarea name="bo_comment" class="form-control" id="edit_bo_comment"></textarea>
@@ -625,10 +595,6 @@
                         <div class="col-md-6 form-group">
                             <label for="so_price">Price</label>
                             <input type="number" class="form-control" id="so_price">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="so_valuation">Valuation (mn)</label>
-                            <input type="number" class="form-control" id="so_valuation">
                         </div>
                         <div class="col-md-6 form-group">
                             <label for="so_est_size">Est Size (.000)</label>
@@ -698,10 +664,6 @@
                         <div class="col-md-6 form-group">
                             <label for="so_price">Price</label>
                             <input type="number" class="form-control" id="edit_so_price">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="so_valuation">Valuation (mn)</label>
-                            <input type="number" class="form-control" id="edit_so_valuation">
                         </div>
                         <div class="col-md-6 form-group">
                             <label for="so_est_size">Est Size (.000)</label>
@@ -827,7 +789,7 @@
                 },
                 columns: [
                     {data: 'buy_id', name: 'buy_id'},
-                    {data: 'company', name: 'company'},
+                    // {data: 'company', name: 'company'},
                     {data: 'contact', name: 'contact'},
                     {data: 'estsize', name: 'estsize'},
                     {data: 'pps', name: 'pps'},
@@ -835,6 +797,7 @@
                     {data: 'shareclass', name: 'shareclass'},
                     {data: 'structure', name: 'structure'},
                     @if(auth()->user()->hasRole('Admin'))
+                    {data: 'fee_structure', name: 'fee_structure'},
                     {data: 'comments', name: 'comments'},
                     {data: 'action', name: 'action', orderable: false, searchable: false},
                     @endif
@@ -856,7 +819,7 @@
                 },
                 columns: [
                     {data: 'sell_id', name: 'sell_id'},
-                    {data: 'company', name: 'company'},
+                    // {data: 'company', name: 'company'},
                     {data: 'contact', name: 'contact'},
                     {data: 'estsize', name: 'estsize'},
                     {data: 'pps', name: 'pps'},
@@ -881,7 +844,7 @@
                 },
                 columns: [
                     {data: 'holding_id', name: 'holding_id'},
-                    {data: 'company', name: 'company'},
+                    // {data: 'company', name: 'company'},
                     {data: 'contact', name: 'contact'},
                     {data: 'holding', name: 'holding'},
                     {data: 'target', name: 'target'},
@@ -966,7 +929,7 @@
                     "company": "{{$active_company->company_id}}",
                     "category": $('#category').val(),
                     "price": $('#price').val(),
-                    "valuation": $('#valuation').val(),
+                    "fee_structure": $('#fee_structure').val(),
                     "est_size": $('#est_size').val(),
                     "share_class": $('#share_class').val(),
                     "structure": $('#structure').val(),
@@ -988,7 +951,7 @@
                 success: function (res) {
                     let result = res.data;
                     $('#edit_price').val(result.pps);
-                    $('#edit_valuation').val(result.valuation);
+                    $('#edit_fee_structure').val(result.fee_structure);
                     $('#edit_est_size').val(result.estsize);
                     $('#edit_bo_comment').val(result.comments);
                     $("#edit_contact option[value=" + result.user_id + "]").prop("selected", true);
@@ -1008,7 +971,7 @@
                     "company": "{{$active_company->company_id}}",
                     "category": $('#edit_category').val(),
                     "price": $('#edit_price').val(),
-                    "valuation": $('#edit_valuation').val(),
+                    "fee_structure": $('#edit_fee_structure').val(),
                     "est_size": $('#edit_est_size').val(),
                     "share_class": $('#edit_share_class').val(),
                     "structure": $('#edit_structure').val(),
@@ -1109,7 +1072,6 @@
                     "company": "{{$active_company->company_id}}",
                     "category": $('#so_category').val(),
                     "price": $('#so_price').val(),
-                    "valuation": $('#so_valuation').val(),
                     "est_size": $('#so_est_size').val(),
                     "share_class": $('#so_share_class').val(),
                     "structure": $('#so_structure').val(),
@@ -1132,7 +1094,6 @@
                 success: function (res) {
                     let result = res.data;
                     $('#edit_so_price').val(result.pps);
-                    $('#edit_so_valuation').val(result.valuation);
                     $('#edit_so_est_size').val(result.estsize);
                     $('#edit_so_comment').val(result.comments);
                     $("#edit_so_contact option[value=" + result.user_id + "]").prop("selected", true);
@@ -1153,7 +1114,6 @@
                     "company": "{{$active_company->company_id}}",
                     "category": $('#edit_so_category').val(),
                     "price": $('#edit_so_price').val(),
-                    "valuation": $('#edit_so_valuation').val(),
                     "est_size": $('#edit_so_est_size').val(),
                     "share_class": $('#edit_so_share_class').val(),
                     "structure": $('#edit_so_structure').val(),
@@ -1255,5 +1215,48 @@
             });
         });
     </script>
+{{--    Pair Order--}}
+    <script>
+        var table=null;
+        $(function () {
+            table =  $('#paired_orders_table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url:"{{ route('getPairOrders') }}",
+                    data: function (d) {
+                        d.company_id = "{{$active_company->company_id}}";
+                    }
+                },
+                columns: [
+                    {data: 'dt_id', name: 'dt_id'},
+                    {data: 'dt_contacts', name: 'dt_contacts'},
+                    {data: 'dt_est_size', name: 'dt_est_size'},
+                    {data: 'dt_pps', name: 'dt_pps'},
+                    {data: 'dt_valuation', name: 'dt_valuation'},
+                    {data: 'dt_share_class', name: 'dt_share_class'},
+                    {data: 'dt_structure', name: 'dt_structure'},
+                        @if(auth()->user()->hasRole('Admin'))
+                    {data: 'dt_fee_structure', name: 'dt_fee_structure'},
+                    {data: 'dt_comments', name: 'dt_comments'}
+                    @endif
+                ]
+            });
 
+        });
+
+        function deletePair(id) {
+            $.ajax({
+                type: "POST",
+                url: "{{url('delete-matching')}}",
+                data: {
+                    "_token": "{{csrf_token()}}",
+                    'match_id':id
+                },
+                success: function (result) {
+                    table.draw();
+                }
+            });
+        }
+    </script>
 @endpush

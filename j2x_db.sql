@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 17, 2022 at 10:32 PM
+-- Generation Time: Sep 23, 2022 at 09:50 PM
 -- Server version: 10.4.22-MariaDB
 -- PHP Version: 8.1.2
 
@@ -79,18 +79,20 @@ CREATE TABLE `buyorder` (
   `structure` varchar(30) DEFAULT NULL,
   `comments` text DEFAULT NULL,
   `status_id` int(11) DEFAULT NULL,
-  `category_id` varchar(255) DEFAULT NULL
+  `category_id` varchar(255) DEFAULT NULL,
+  `fee_structure` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `buyorder`
 --
 
-INSERT INTO `buyorder` (`buy_id`, `user_id`, `company_id`, `estsize`, `pps`, `valuation`, `shareclass`, `structure`, `comments`, `status_id`, `category_id`) VALUES
-(1, 2, 6, 23, '23.00', 25, 'Common', 'SPV', 'asddd', NULL, NULL),
-(2, 2, 6, 12, '222.00', 12, 'Preferred', 'Direct Shares', 'Test', NULL, NULL),
-(3, 2, 6, 9, '100.00', 9, 'Preferred', 'Direct Shares', 'jhjkjh', NULL, NULL),
-(4, 1, 1, 89, '909.00', 9, 'Common', 'Forward', 'jhui', NULL, NULL);
+INSERT INTO `buyorder` (`buy_id`, `user_id`, `company_id`, `estsize`, `pps`, `valuation`, `shareclass`, `structure`, `comments`, `status_id`, `category_id`, `fee_structure`) VALUES
+(1, 2, 6, 23, '23.00', 25, 'Common', 'SPV', 'asddd', NULL, NULL, NULL),
+(2, 2, 7, 12, '222.00', 2664, 'Preferred', 'Direct Shares', 'Test', NULL, NULL, 10),
+(3, 2, 6, 9, '100.00', 9, 'Preferred', 'Direct Shares', 'jhjkjh', NULL, NULL, NULL),
+(4, 1, 1, 89, '909.00', 9, 'Common', 'Forward', 'jhui', NULL, NULL, NULL),
+(5, 3, 7, 3, '3.00', 9, 'Preferred', 'Direct Shares', 'jhsdh', NULL, NULL, 12);
 
 -- --------------------------------------------------------
 
@@ -255,11 +257,10 @@ INSERT INTO `matching` (`match_id`, `company_id`, `buy_id`, `sell_id`, `estsize`
 (2, 6, 2, 1, NULL, NULL, 5),
 (3, 6, 2, 2, NULL, NULL, 5),
 (5, 1, 4, 3, NULL, NULL, 11),
-(6, 1, 4, 3, NULL, NULL, 12),
 (7, 0, 1, 3, NULL, NULL, 13),
 (8, 0, 3, 3, NULL, NULL, 13),
-(9, 0, 3, 1, NULL, NULL, 15),
-(10, 0, 3, 3, NULL, NULL, 15);
+(10, 0, 3, 3, NULL, NULL, 15),
+(11, 7, 5, 4, NULL, NULL, 16);
 
 -- --------------------------------------------------------
 
@@ -341,7 +342,8 @@ INSERT INTO `pairs` (`id`, `comment`, `created_at`, `updated_at`) VALUES
 (11, NULL, '2022-09-17 13:35:57', '2022-09-17 13:35:57'),
 (12, NULL, '2022-09-17 13:36:23', '2022-09-17 13:36:23'),
 (13, NULL, '2022-09-17 14:04:30', '2022-09-17 14:04:30'),
-(15, 'klkl', '2022-09-17 14:07:43', '2022-09-17 14:07:43');
+(15, 'klkl', '2022-09-17 14:07:43', '2022-09-17 14:07:43'),
+(16, 'asdasda', '2022-09-23 14:17:49', '2022-09-23 14:17:49');
 
 -- --------------------------------------------------------
 
@@ -512,17 +514,19 @@ CREATE TABLE `sellorder` (
   `structure` varchar(30) DEFAULT NULL,
   `comments` text DEFAULT NULL,
   `status_id` int(11) DEFAULT NULL,
-  `category_id` int(11) DEFAULT NULL
+  `category_id` int(11) DEFAULT NULL,
+  `fee_structure` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `sellorder`
 --
 
-INSERT INTO `sellorder` (`sell_id`, `user_id`, `company_id`, `estsize`, `pps`, `valuation`, `shareclass`, `structure`, `comments`, `status_id`, `category_id`) VALUES
-(1, 2, NULL, 90, '120.00', 91, 'Ordinary', 'Direct Shares', 'uiuiui', NULL, NULL),
-(2, 2, 6, 80, '70.00', 70, 'Preferred', 'Direct Shares', 'JOB', NULL, NULL),
-(3, 1, 1, 8, '77.00', 60, 'Preferred', 'Direct Shares', 'Teest', NULL, NULL);
+INSERT INTO `sellorder` (`sell_id`, `user_id`, `company_id`, `estsize`, `pps`, `valuation`, `shareclass`, `structure`, `comments`, `status_id`, `category_id`, `fee_structure`) VALUES
+(1, 2, NULL, 90, '120.00', 91, 'Ordinary', 'Direct Shares', 'uiuiui', NULL, NULL, NULL),
+(2, 2, NULL, 80, '2.00', 160, 'Preferred', 'Direct Shares', 'JOB', NULL, NULL, NULL),
+(3, 1, 1, 8, '77.00', 60, 'Preferred', 'Direct Shares', 'Teest', NULL, NULL, NULL),
+(4, 3, 7, 12, '123.00', 12, 'Common', 'SPV', 'asdasdasd', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -837,7 +841,7 @@ ALTER TABLE `business`
 -- AUTO_INCREMENT for table `buyorder`
 --
 ALTER TABLE `buyorder`
-  MODIFY `buy_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `buy_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `company`
@@ -873,7 +877,7 @@ ALTER TABLE `layers`
 -- AUTO_INCREMENT for table `matching`
 --
 ALTER TABLE `matching`
-  MODIFY `match_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `match_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `migrations`
@@ -885,7 +889,7 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT for table `pairs`
 --
 ALTER TABLE `pairs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `permissions`
@@ -921,7 +925,7 @@ ALTER TABLE `sectors`
 -- AUTO_INCREMENT for table `sellorder`
 --
 ALTER TABLE `sellorder`
-  MODIFY `sell_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `sell_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `shareclass`

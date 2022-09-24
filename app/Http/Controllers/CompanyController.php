@@ -33,24 +33,6 @@ class CompanyController extends Controller
             $activeCompany = $companies[0];
         }
 
-        if (\request('search_pair')){
-            $pairs = Pair::with(['matchings.SaleOrder.Contact', 'matchings.BuyOrder.Contact'])
-                ->whereHas('matchings',function ($q){
-                    $q->whereHas('SaleOrder',function ($sq){
-                        $sq->whereHas('Contact',function ($sq_contact){
-                            $sq_contact->where('name',\request('search'));
-                        });
-                    })->orwhereHas('BuyOrder',function ($sq){
-                        $sq->whereHas('Contact',function ($sq_contact){
-                            $sq_contact->where('name',\request('search'));
-                        });
-                    });
-                })->paginate(50);
-
-        }else{
-            $pairs = Pair::with(['matchings.SaleOrder.Contact', 'matchings.BuyOrder.Contact'])->paginate(50);
-
-        }
 
         $data = [
             'all_companies'=>$companies,
@@ -61,8 +43,7 @@ class CompanyController extends Controller
             'share_classes'=>$share_classes,
             'categories'=>$categories,
             'structures'=>$structures,
-            'contacts'=>$users,
-            'pairs'=>$pairs
+            'contacts'=>$users
         ];
 
         return view('admin.companies.index',$data);

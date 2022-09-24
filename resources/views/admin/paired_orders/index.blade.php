@@ -3,70 +3,78 @@
 @section('title','Paired Orders')
 
 @section('content')
+    <style>
+        td { white-space:pre !important; }
+    </style>
 <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
                     <p>{{ __('Paired Orders') }}</p>
-                    <form action="{{url('paired-order')}}" class="d-flex">
-                        <input type="search" name="search" placeholder="search" class="form-control input-group-sm" value="{{request('search')}}">
-                        <button class="btn btn-primary ml-1 btn-sm">Search</button>
-                    </form>
                 </div>
 
                 <div class="card-body">
-                    <table class="table table-bordered">
+                    <table class="table table-bordered" id="paired_orders_table">
                         <thead>
                         <tr>
-                            <th>No</th>
-                            <th>Contacts (SO - PO)</th>
-                            <th>EST Size (SO - PO)</th>
-                            <th>PPS  (SO - PO)</th>
-                            <th>Valuation  (SO - PO)</th>
-                            <th>Pair Comment</th>
-                            <th>Action</th>
+                            <th>ID</th>
+                            <th>Contact</th>
+                            <th>EST Size</th>
+                            <th>PPS</th>
+                            <th>Valuation</th>
+                            <th>Share Class</th>
+                            <th>Structure</th>
+                            @if(auth()->user()->hasRole('Admin'))
+                            <th>Fee Structure</th>
+                            <th>Comment</th>
+                                @endif
                         </tr>
                         </thead>
-                        <tbody>
-                            @foreach($pairs as $index=>$pair)
-                                <tr>
-                                    <td>{{$index+1}}</td>
-                                    <td>
-                                        @foreach($pair->Matchings as $matching)
-                                            <p>{{$matching->SaleOrder->Contact ? $matching->SaleOrder->Contact->name : 'N/A'}} - {{$matching->SaleOrder->Contact ? $matching->BuyOrder->Contact->name : 'N/A'}}</p>
-                                        @endforeach
-                                    </td>
-                                    <td>
-                                        @foreach($pair->Matchings as $matching)
-                                            <p>{{$matching->SaleOrder->est_size ? $matching->SaleOrder->est_size : 'N/A'}} - {{$matching->SaleOrder->est_size ? $matching->BuyOrder->est_size : 'N/A'}}</p>
-                                        @endforeach
-                                    </td>
-                                    <td>
-                                        @foreach($pair->Matchings as $matching)
-                                            <p>{{$matching->SaleOrder->pps ? $matching->SaleOrder->pps : 'N/A'}} - {{$matching->SaleOrder->pps ? $matching->BuyOrder->pps : 'N/A'}}</p>
-                                        @endforeach
-                                    </td>
-                                    <td>
-                                        @foreach($pair->Matchings as $matching)
-                                            <p>{{$matching->SaleOrder->valuation ? $matching->SaleOrder->valuation : 'N/A'}} - {{$matching->SaleOrder->valuation ? $matching->BuyOrder->valuation : 'N/A'}}</p>
-                                        @endforeach
-                                    </td>
-                                    <td>
-                                        {{$pair->comment}}
-                                    </td>
-                                    <td>
-                                        <a href="{{url('paired_order_delete').'/'.$pair->id}}" class="btn btn-danger btn-sm"> Delete</a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
                     </table>
-
-                    <div class="d-flex justify-content-between" style="float: right">
-                        {{$pairs->links('pagination::bootstrap-4')}}
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 @endsection
+@push('js')
+    <script>
+        var table=null;
+        $(function () {
+            table =  $('#paired_orders_table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url:"{{ route('getPairOrders') }}",
+                },
+                columns: [
+                    {data: 'dt_id', name: 'dt_id'},
+                    {data: 'dt_contacts', name: 'dt_contacts'},
+                    {data: 'dt_est_size', name: 'dt_est_size'},
+                    {data: 'dt_pps', name: 'dt_pps'},
+                    {data: 'dt_valuation', name: 'dt_valuation'},
+                    {data: 'dt_share_class', name: 'dt_share_class'},
+                    {data: 'dt_structure', name: 'dt_structure'},
+                    @if(auth()->user()->hasRole('Admin'))
+                    {data: 'dt_fee_structure', name: 'dt_fee_structure'},
+                    {data: 'dt_comments', name: 'dt_comments'}
+                    @endif
+                ]
+            });
+
+        });
+
+        function deletePair(id) {
+            $.ajax({
+                type: "POST",
+                url: "{{url('delete-matching')}}",
+                data: {
+                    "_token": "{{csrf_token()}}",
+                    'match_id':id
+                },
+                success: function (result) {
+                    table.draw();
+                }
+            });
+        }
+    </script>
+@endpush
