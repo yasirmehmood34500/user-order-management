@@ -115,8 +115,9 @@ class ContactsController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        //
+        User::where('id',$request->contact_id)->delete();
+        return response()->json(['status' => true, 'message' => 'User delete']);
     }
 }

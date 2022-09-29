@@ -17235,7 +17235,21 @@ a.typo_link.text-gray-900:after {
     padding: 0 12px; }
     .layout-sidebar-vertical .sidebar-panel .side-nav .main-menu ul li {
       list-style: none;
-      font-size: 15px; }
+      font-size: 15px;
+      display: flex;
+      justify-content: space-between;
+      line-height: 34px;
+      height: 36px;
+      padding-right: 10px;
+  
+     }
+     #menu > .active a{
+      color: #fff;
+     }
+     #menu > li span{
+      color: red;
+      cursor: pointer;
+     }
       .layout-sidebar-vertical .sidebar-panel .side-nav .main-menu ul li a {
         color: #47404f;
         display: flex;

@@ -30,11 +30,13 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('/save-company', [App\Http\Controllers\CompanyController::class, 'store'])->name('save.companies');
     Route::get('/edit-company/{id}', [App\Http\Controllers\CompanyController::class, 'edit'])->name('edit.companies');
     Route::post('/update-company/{id}', [App\Http\Controllers\CompanyController::class, 'update'])->name('update.companies');
+    Route::post('/delete-company', [App\Http\Controllers\CompanyController::class, 'destroy'])->name('delete.companies');
 
 //    user
     Route::get('/contacts', [App\Http\Controllers\ContactsController::class, 'index'])->name('contacts');
     Route::post('/save-user', [App\Http\Controllers\ContactsController::class, 'store'])->name('contacts.store');
     Route::post('/update-user/{id}', [App\Http\Controllers\ContactsController::class, 'update'])->name('contacts.update');
+    Route::post('/delete-user', [App\Http\Controllers\ContactsController::class, 'destroy'])->name('contacts.delete');
 
     Route::get('/get-buy-orders', [App\Http\Controllers\BuyOrderController::class, 'buyOrders'])->name('buyOrders');
     Route::post('/save-buy-order', [App\Http\Controllers\BuyOrderController::class, 'store'])->name('buy.store');

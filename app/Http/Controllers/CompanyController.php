@@ -123,8 +123,9 @@ class CompanyController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        //
+        Company::where('company_id',$request->company_id)->delete();
+        return response()->json(['status' => true, 'message' => 'Company delete']);
     }
 }
