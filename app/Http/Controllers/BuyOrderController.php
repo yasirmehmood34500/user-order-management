@@ -92,7 +92,7 @@ class BuyOrderController extends Controller
                     return $data;
                 })
                 ->addColumn('action', function($row){
-                    $btn = '<i class="fa fa-edit fa--customer-icon"  data-toggle="modal"  style="background-color: #dde1e5;"
+                    $btn = '<i class="fa fa-edit fa--customer-icon"  data-toggle="modal" 
                         data-target="#editBuyModal" onclick="getBuyID('.$row->buy_id.')"></i>';
                     return $btn;
                 })
