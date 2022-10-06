@@ -43,7 +43,7 @@ class BuyOrderController extends Controller
 
 
         $data = [
-            'all_companies'=>$companies,
+            'companies'=>$companies,
             'sectors'=>$sectors,
             'business'=>$business,
             'locations'=>$locations,
@@ -59,7 +59,9 @@ class BuyOrderController extends Controller
     public function buyOrders(Request $request)
     {
         if ($request->ajax()) {
+//            dd(auth()->user()->hasRole('Admin'));
             if (auth()->user()->hasRole('Admin')) {
+//                dd('jkasd');
                 if ($request->filter_orders_of == 'company') {
                     $data = BuyOrder::query()->with(['Contact', 'Company'])->where('company_id',$request->id)->get();
                 }else if ($request->filter_orders_of == 'contacts'){
@@ -68,7 +70,11 @@ class BuyOrderController extends Controller
                     $data = BuyOrder::query()->with(['Contact', 'Company'])->get();
                 }
             }else{
-                $data = BuyOrder::query()->where('user_id',Auth::id())->get();
+                if ($request->id) {
+                    $data = BuyOrder::query()->where('user_id', Auth::id())->where('company_id', $request->id)->get();
+                }else{
+                    $data = BuyOrder::query()->where('user_id', Auth::id())->get();
+                }
             }
             return Datatables::of($data)
                 ->addIndexColumn()
@@ -76,7 +82,7 @@ class BuyOrderController extends Controller
                 ->addColumn('buy_id', function($row) {
                     if (auth()->user()->hasRole('Admin')){
                         $pair_icon = '<i class="fa-solid fa-code-merge text-danger fa--customer-icon"  data-toggle="modal"
-                        data-target="#pairBuyModal" onclick="pairOrder(' . $row->buy_id . ')"></i>';
+                        data-target="#pairBuyModal" onclick="pairOrder(' . $row->buy_id . ','.$row->company_id.')"></i>';
                     }else{
                         $pair_icon='';
                     }
@@ -92,9 +98,11 @@ class BuyOrderController extends Controller
                     return $data;
                 })
                 ->addColumn('action', function($row){
-                    $btn = '<i class="fa fa-edit fa--customer-icon"  data-toggle="modal" 
-                        data-target="#editBuyModal" onclick="getBuyID('.$row->buy_id.')"></i>';
-                    return $btn;
+                $deleteType = 1;
+                $id=$row->buy_id;
+                $btn = '<i class="fa fa-edit fa--customer-icon"  data-toggle="modal"  style="background-color: #dde1e5;"
+                    data-target="#editBuyModal" onclick="getBuyID('.$row->buy_id.')"></i>'.'<i class="fa fa-trash text-danger fa--customer-icon" onclick="deleteFromGrid('.$id.','.$deleteType.')"> </i>';
+                return $btn;
                 })
                 ->rawColumns(['action','buy_id'])
                 ->make(true);
@@ -110,10 +118,10 @@ class BuyOrderController extends Controller
                 }else if ($request->filter_orders_of == 'contacts'){
                     $data = BuyOrder::query()->with(['Contact', 'Company'])->where('user_id',$request->id)->get();
                 }else{
-                    $data = BuyOrder::query()->with(['Contact', 'Company'])->get();
+                    $data = BuyOrder::query()->with(['Contact', 'Company'])->where('company_id',$request->id)->get();
                 }
             }else{
-                $data = BuyOrder::query()->where('user_id',Auth::id())->get();
+                $data = BuyOrder::query()->where('user_id',Auth::id())->where('company_id',$request->id)->get();
             }
             return Datatables::of($data)
                 ->addIndexColumn()

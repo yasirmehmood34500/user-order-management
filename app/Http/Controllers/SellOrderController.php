@@ -64,14 +64,18 @@ class SellOrderController extends Controller
                     $data = SellOrder::query()->with(['Contact', 'Company'])->get();
                 }
             }else{
-                $data = SellOrder::query()->where('user_id',Auth::id())->get();
+                if ($request->id) {
+                    $data = SellOrder::query()->where('user_id', Auth::id())->where('company_id', $request->id)->get();
+                }else{
+                    $data = SellOrder::query()->where('user_id', Auth::id())->get();
+                }
             }
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('sell_id', function($row){
                     if (auth()->user()->hasRole('Admin')) {
                         $pair_icon = '<i class="fa-solid fa-code-merge text-danger fa--customer-icon"  data-toggle="modal"
-                        data-target="#pairSOModal" onclick="pairSellOrder('.$row->sell_id.')"></i>';
+                        data-target="#pairSOModal" onclick="pairSellOrder('.$row->sell_id.','.$row->company_id.')"></i>';
                     }else{
                         $pair_icon = '';
                     }
@@ -85,8 +89,10 @@ class SellOrderController extends Controller
                     $data = $row->Company ? $row->Company->comp_name:'N/A';
                     return $data;
                 })->addColumn('action', function($row){
+                    $deleteType = 2;
+                    $id=$row->sell_id;
                     $btn = '<i class="fa fa-edit fa--customer-icon" data-toggle="modal"
-                        data-target="#editSOModal" onclick="getSO_ID('.$row->sell_id.')"></i>';
+                        data-target="#editSOModal" onclick="getSO_ID('.$row->sell_id.')"></i>'.'<i class="fa fa-trash text-danger fa--customer-icon" onclick="deleteFromGrid('.$id.','.$deleteType.')"> </i>';
 //                    $btn = '<a href="javascript:void(0)" class="edit btn btn-primary btn-sm" data-toggle="modal"
 //                        data-target="#editSOModal" onclick="getSO_ID('.$row->sell_id.')">Edit</a>';
                     return $btn;
@@ -105,10 +111,10 @@ class SellOrderController extends Controller
                 }else if ($request->filter_orders_of == 'contacts'){
                     $data = SellOrder::query()->with(['Contact', 'Company'])->where('user_id',$request->id)->get();
                 }else{
-                    $data = SellOrder::query()->with(['Contact', 'Company'])->get();
+                    $data = SellOrder::query()->with(['Contact', 'Company'])->where('company_id',$request->id)->get();
                 }
             }else{
-                $data = SellOrder::query()->where('user_id',Auth::id())->get();
+                $data = SellOrder::query()->where('user_id',Auth::id())->where('company_id',$request->id)->get();
             }
             return Datatables::of($data)
                 ->addIndexColumn()
@@ -169,6 +175,7 @@ class SellOrderController extends Controller
             'shareclass'=>$request->share_class,
             'valuation'=>$request->est_size * $request->price,
             'structure'=>$request->structure,
+            'fee_structure'=>$request->fee_structure,
             'comments'=>$request->bo_comment,
             'category_id'=>$request->category_id,
         ]);
@@ -221,6 +228,7 @@ class SellOrderController extends Controller
             'shareclass'=>$request->share_class,
             'valuation'=>$request->est_size * $request->price,
             'structure'=>$request->structure,
+            'fee_structure'=>$request->fee_structure,
             'comments'=>$request->bo_comment,
             'category_id'=>$request->category_id,
         ]);

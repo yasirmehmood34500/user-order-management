@@ -12,6 +12,10 @@
                         <a href="#"  id="buy_order" class="btn btn-secondary"  onclick="exportTableToCSV('buy_orders {{now()->format('Y-d-m')}}')">
                             Export
                         </a>
+                        <button type="button" id="buy_order" class="text-muted btn btn-muted" data-toggle="modal"
+                                data-target="#addBuyModal">
+                            Buy New Order
+                        </button>
                     </div>
                 </div>
 
@@ -27,11 +31,11 @@
                             <th>Valuation</th>
                             <th>Share Class</th>
                             <th>Structure</th>
-                            <th>Fee Structure</th>
                             @if(auth()->user()->hasRole('Admin'))
+                            <th>Fee Structure</th>
                                 <th>comment</th>
-                                <th width="100px">Action</th>
                             @endif
+                                <th width="100px">Action</th>
                         </tr>
                         </thead>
                     </table>
@@ -75,6 +79,87 @@
             </div>
         </div>
     </div>
+    <!--Buy Order Modal -->
+    <div class="modal fade" id="addBuyModal" tabindex="-1" role="dialog"
+         aria-labelledby="addBuyModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addBuyLabel">Add Buy Order Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="bo_company">Company</label>
+                            <select name="bo_company" id="bo_company" class="form-control">
+                                @foreach($companies as $company)
+                                    <option value="{{$company->company_id}}">{{$company->comp_name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="contact">Contacts</label>
+                            <select name="contact" id="contact" class="form-control">
+                                @foreach($contacts as $contact)
+                                    <option value="{{$contact->id}}" {{auth()->user()->hasRole('User') ? (auth()->user()->id == $contact->id ? 'selected' :'') : '' }}>{{$contact->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="category">Category</label>
+                            <select name="category" id="category" class="form-control">
+                                @foreach($categories as $category)
+                                    <option value="{{$category->category_id}}">{{$category->categoryname}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="price">Price</label>
+                            <input type="number" class="form-control" id="price">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="est_size">Est Size (.000)</label>
+                            <input type="number" class="form-control" id="est_size">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="share_class">Share Class</label>
+                            <select name="share_class" id="share_class" class="form-control">
+                                @foreach($share_classes as $share_class)
+                                    <option value="{{$share_class->classname}}">{{$share_class->classname}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="structure">Structures</label>
+                            <select name="structure" id="structure" class="form-control">
+                                @foreach($structures as $structure)
+                                    <option value="{{$structure->structurename}}">{{$structure->structurename}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @if(auth()->user()->hasRole('Admin'))
+                            <div class="col-md-6 form-group">
+                                <label for="fee_structure">Fee structure </label>
+                                <input type="text" class="form-control" id="fee_structure">
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label for="bo_comment">Comments</label>
+                                <textarea name="bo_comment" class="form-control" id="bo_comment"></textarea>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveBuyButton">Save Button</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!--Buy Order edit Modal -->
     <div class="modal fade" id="editBuyModal" tabindex="-1" role="dialog"
          aria-labelledby="editBuyModalLabel" aria-hidden="true">
@@ -132,7 +217,7 @@
                         @if(auth()->user()->hasRole('Admin'))
                             <div class="col-md-6 form-group">
                                 <label for="fee_structure">Fee structure</label>
-                                <input type="number" class="form-control" id="edit_fee_structure">
+                                <input type="text" class="form-control" id="edit_fee_structure">
                             </div>
                             <div class="col-md-6 form-group">
                                 <label for="bo_comment">Comments</label>
@@ -172,17 +257,19 @@
                     {data: 'valuation', name: 'valuation'},
                     {data: 'shareclass', name: 'shareclass'},
                     {data: 'structure', name: 'structure'},
-                    {data: 'fee_structure', name: 'fee_structure'},
                         @if(auth()->user()->hasRole('Admin'))
+                    {data: 'fee_structure', name: 'fee_structure'},
                     {data: 'comments', name: 'comments'},
-                    {data: 'action', name: 'action', orderable: false, searchable: false},
                     @endif
+                    {data: 'action', name: 'action', orderable: false, searchable: false},
                 ]
             });
 
         });
         </script>
     <script>
+        let BuyOrderID = '';
+
         let so_arr=[];
         function selectSO(id){
             if(!so_arr.includes(id)){          //checking weather array contain the id
@@ -193,7 +280,7 @@
             // arr.push(id);
             console.log(so_arr);
         }
-        function pairOrder(id) {
+        function pairOrder(id,company_id) {
             BuyOrderID=id;
             console.log(id);
             $('.make-so-pair tbody').html(' ');
@@ -205,8 +292,8 @@
                 ajax: {
                     url:"{{ route('forPairSellOrders') }}",
                     data: function (d) {
-                        d.id = "";
-                        d.filter_orders_of = "";
+                        d.id = company_id;
+                        d.filter_orders_of = "all";
                     }
                 },
                 columns: [
@@ -237,6 +324,7 @@
                 }
             });
         });
+
         function getBuyID(id) {
             BuyOrderID = id;
             $.ajax({
@@ -304,6 +392,31 @@
         }
     </script>
     <script>
+        $("#saveBuyButton").click(function () {
+            $.ajax({
+                type: "POST",
+                url: "{{url('save-buy-order')}}",
+                data: {
+                    "_token": "{{csrf_token()}}",
+                    "contact": $('#contact').val(),
+                    "company": $('#bo_company').val(),
+                    "category": $('#category').val(),
+                    "price": $('#price').val(),
+                    "fee_structure": $('#fee_structure').val(),
+                    "est_size": $('#est_size').val(),
+                    "share_class": $('#share_class').val(),
+                    "structure": $('#structure').val(),
+                    "bo_comment": $('#bo_comment').val(),
+                },
+                success: function (result) {
+                    if (result.status) {
+                        alert(result.message);
+                        window.location.reload();
+                    }
+                }
+            });
+        });
+
         $("#updateBuyButton").click(function () {
             $.ajax({
                 type: "POST",

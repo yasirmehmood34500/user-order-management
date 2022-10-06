@@ -12,6 +12,10 @@
                         <a href="#"  id="buy_order" class="btn btn-secondary"  onclick="exportTableToCSV('sell_orders {{now()->format('Y-d-m')}}')">
                             Export
                         </a>
+                        <button type="button" id="sell_order" class="text-muted btn btn-muted" data-toggle="modal"
+                                data-target="#addSellModal">
+                            New Sale Order
+                        </button>
                     </div>
                 </div>
 
@@ -28,84 +32,13 @@
                             <th>Share Class</th>
                             <th>Structure</th>
                             @if(auth()->user()->hasRole('Admin'))
+                                <th>Fee Structure</th>
                                 <th>comment</th>
-                                <th width="100px">Action</th>
                             @endif
+                            <th width="100px">Action</th>
                         </tr>
                         </thead>
                     </table>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--Buy Order Modal -->
-    <div class="modal fade" id="addBuyModal" tabindex="-1" role="dialog"
-         aria-labelledby="addBuyModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addBuyLabel">Add Buy Order Details</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6 form-group">
-                            <label for="contact">Contacts</label>
-                            <select name="contact" id="contact" class="form-control">
-                                @foreach($contacts as $contact)
-                                    <option value="{{$contact->id}}">{{$contact->name}}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="category">Category</label>
-                            <select name="category" id="category" class="form-control">
-                                @foreach($categories as $category)
-                                    <option value="{{$category->category_id}}">{{$category->categoryname}}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="price">Price</label>
-                            <input type="number" class="form-control" id="price">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="valuation">Valuation (mn)</label>
-                            <input type="number" class="form-control" id="valuation">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="est_size">Est Size (.000)</label>
-                            <input type="number" class="form-control" id="est_size">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="share_class">Share Class</label>
-                            <select name="share_class" id="share_class" class="form-control">
-                                @foreach($share_classes as $share_class)
-                                    <option value="{{$share_class->classname}}">{{$share_class->classname}}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="structure">Structures</label>
-                            <select name="structure" id="structure" class="form-control">
-                                @foreach($structures as $structure)
-                                    <option value="{{$structure->structurename}}">{{$structure->structurename}}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        @if(auth()->user()->hasRole('Admin'))
-                            <div class="col-md-6 form-group">
-                                <label for="bo_comment">Comments</label>
-                                <textarea name="bo_comment" class="form-control" id="bo_comment"></textarea>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="saveBuyButton">Save Button</button>
                 </div>
             </div>
         </div>
@@ -198,10 +131,18 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6 form-group">
+                            <label for="so_company">Company</label>
+                            <select name="so_company" id="so_company" class="form-control">
+                                @foreach($companies as $company)
+                                    <option value="{{$company->company_id}}">{{$company->comp_name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
                             <label for="so_contact">Contacts</label>
                             <select name="contact" id="so_contact" class="form-control">
                                 @foreach($contacts as $contact)
-                                    <option value="{{$contact->id}}">{{$contact->name}}</option>
+                                    <option value="{{$contact->id}}" {{auth()->user()->hasRole('User') ? (auth()->user()->id == $contact->id ? 'selected' :'') : '' }}>{{$contact->name}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -216,10 +157,6 @@
                         <div class="col-md-6 form-group">
                             <label for="so_price">Price</label>
                             <input type="number" class="form-control" id="so_price">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="so_valuation">Valuation (mn)</label>
-                            <input type="number" class="form-control" id="so_valuation">
                         </div>
                         <div class="col-md-6 form-group">
                             <label for="so_est_size">Est Size (.000)</label>
@@ -242,6 +179,10 @@
                             </select>
                         </div>
                         @if(auth()->user()->hasRole('Admin'))
+                            <div class="col-md-6 form-group">
+                                <label for="so_fee_structure">Fee structure </label>
+                                <input type="text" class="form-control" id="so_fee_structure">
+                            </div>
                             <div class="col-md-6 form-group">
                                 <label for="so_comment">Comments</label>
                                 <textarea name="so_comment" class="form-control" id="so_comment"></textarea>
@@ -311,6 +252,10 @@
                             </select>
                         </div>
                         @if(auth()->user()->hasRole('Admin'))
+                            <div class="col-md-6 form-group">
+                                <label for="edit_so_fee_structure">Fee structure </label>
+                                <input type="text" class="form-control" id="edit_so_fee_structure">
+                            </div>
                             <div class="col-md-6 form-group">
                                 <label for="so_comment">Comments</label>
                                 <textarea name="so_comment" class="form-control" id="edit_so_comment"></textarea>
@@ -385,10 +330,11 @@
                     {data: 'valuation', name: 'valuation'},
                     {data: 'shareclass', name: 'shareclass'},
                     {data: 'structure', name: 'structure'},
-                        @if(auth()->user()->hasRole('Admin'))
+                    @if(auth()->user()->hasRole('Admin'))
+                    {data: 'fee_structure', name: 'fee_structure'},
                     {data: 'comments', name: 'comments'},
-                    {data: 'action', name: 'action', orderable: false, searchable: false},
                     @endif
+                    {data: 'action', name: 'action', orderable: false, searchable: false},
                 ]
             });
 
@@ -403,12 +349,13 @@
                 data: {
                     "_token": "{{csrf_token()}}",
                     "contact": $('#so_contact').val(),
-                    {{--"company": "{{$active_company->company_id}}",--}}
+                    "company": $('#so_company').val(),
                     "category": $('#so_category').val(),
                     "price": $('#so_price').val(),
                     "est_size": $('#so_est_size').val(),
                     "share_class": $('#so_share_class').val(),
                     "structure": $('#so_structure').val(),
+                    "fee_structure": $('#so_fee_structure').val(),
                     "bo_comment": $('#so_comment').val(),
                 },
                 success: function (result) {
@@ -428,7 +375,7 @@
                 success: function (res) {
                     let result = res.data;
                     $('#edit_so_price').val(result.pps);
-                    $('#edit_so_valuation').val(result.valuation);
+                    $('#edit_so_fee_structure').val(result.fee_structure);
                     $('#edit_so_est_size').val(result.estsize);
                     $('#edit_so_comment').val(result.comments);
                     $("#edit_so_contact option[value=" + result.user_id + "]").prop("selected", true);
@@ -449,7 +396,7 @@
                     {{--"company": "{{$active_company->company_id}}",--}}
                     "category": $('#edit_so_category').val(),
                     "price": $('#edit_so_price').val(),
-                    "valuation": $('#edit_so_valuation').val(),
+                    "fee_structure": $('#edit_so_fee_structure').val(),
                     "est_size": $('#edit_so_est_size').val(),
                     "share_class": $('#edit_so_share_class').val(),
                     "structure": $('#edit_so_structure').val(),
@@ -480,7 +427,7 @@
             console.log(bo_arr , 'sdasd');
         }
 
-        function pairSellOrder(id) {
+        function pairSellOrder(id,company_id) {
             SOOrderID=id;
 
             console.log(id);
@@ -493,8 +440,8 @@
                 ajax: {
                     url:"{{ route('forPairBuyOrders') }}",
                     data: function (d) {
-                        d.id = "";
-                        d.filter_orders_of = "";
+                        d.id = company_id;
+                        d.filter_orders_of = "all";
                     }
                 },
                 columns: [

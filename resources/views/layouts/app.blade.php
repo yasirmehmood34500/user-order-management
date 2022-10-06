@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>J2X</title>
+    <title></title>
     <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,400i,600,700,800,900" rel="stylesheet" />
     <link href="{{asset('dist-assets/css/themes/lite-purple.css')}}" rel="stylesheet" />
     <link href="{{asset('dist-assets/css/plugins/perfect-scrollbar.css')}}" rel="stylesheet" />
@@ -17,7 +17,7 @@
     <style>
         .fa--customer-icon{
             font-size: 14px !important;
-            /* background-color: #dde1e5; */
+            background-color: #dde1e5;
             padding: 5px;
             margin-right: 10px !important;
             cursor: pointer;
@@ -64,14 +64,13 @@
 {{--                    <i class="nav-icon i-Receipt-4 mr-3 text-20  cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Current Holdings"></i>--}}
 {{--                </a>--}}
             </div>
-            @if(auth()->user()->hasRole('Admin'))
             @yield('search')
+            @yield('filter')
             <div class="scroll-nav ps ps--active-y" data-perfect-scrollbar="data-perfect-scrollbar" data-suppress-scroll-x="true">
                 <div class="side-nav">
                     @yield('side-bar-links')
                 </div>
             </div>
-                @endif
         </div>
 
         <div class="main-content-wrap mobile-menu-content bg-off-white m-0">
@@ -106,8 +105,55 @@
     <script src="{{asset('dist-assets/js/scripts/echart.options.min.js')}}"></script>
     <script src="{{asset('dist-assets/js/scripts/dashboard.v1.script.min.js')}}"></script>
     <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script>
+        function deleteFromGrid(id,ty) {
+            let type = null;
+            if (ty==1){
+                type='buy_order';
+            }else if (ty==2){
+                type='sell_order';
+            }else if (ty==3){
+                type='holding';
+            }else if (ty==4){
+                type='target';
+            }else if (ty==5){
+                type='company';
+            }else if (ty==6){
+                type='contact';
+            }
+
+            var result = confirm("Are you sure you want to delete current item");
+            console.log(id,type);
+
+            if (result) {
+                $.ajax({
+                    type: "POST",
+                    url: "{{url('delete-from-grid')}}",
+                    data: {
+                        "_token": "{{csrf_token()}}",
+                        'id':id,
+                        'type':type
+                    },
+                    success: function (response) {
+                        if (type=='contact'){
+                            location.href= "{{url('contacts')}}";
+                        } else if(type=='company'){
+                            location.href= "{{url('companies')}}";
+
+                        } else {
+                            window.location.reload();
+                        }
+
+                    }
+                });
+            }
+
+        }
+
+    </script>
 
     @stack('js')
+
 </body>
 
 </html>

@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Business;
 use App\Models\BuyOrder;
 use App\Models\Company;
+use App\Models\Holding;
 use App\Models\Location;
+use App\Models\matching;
 use App\Models\Sector;
+use App\Models\SellOrder;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +23,11 @@ class ContactsController extends Controller
 
     public function index()
     {
-        $users = User::with(['Location','Sector'])->orderBy('name','ASC')->get();
+        if (Auth::user()->hasRole('Admin')) {
+            $users = User::with(['Location', 'Sector'])->orderBy('name', 'ASC')->get();
+        }else{
+            $users = User::with(['Location','Sector'])->where('id','!=',1)->orderBy('name','ASC')->get();
+        }
         $sectors = Sector::all();
         $business = Business::all();
         $locations = Location::all();
@@ -31,7 +38,11 @@ class ContactsController extends Controller
         if (\request('search')){
             $activeUser = User::where('id',\request('search'))->first();
         } else {
-            $activeUser = $users[0];
+            if (Auth::user()->hasRole('Admin')) {
+                $activeUser = $users[0];
+            }else{
+                $activeUser = User::where('id',Auth::id())->first();
+            }
         }
         $data = [
             'users'=>$users,
@@ -59,7 +70,7 @@ class ContactsController extends Controller
         $this->validate($request,[
            'email'=>'required|unique:users,email',
            'password'=>'required',
-           'name'=>'required',
+           'user_name'=>'required',
         ]);
         $user =  User::create([
             "name" => $request->user_name,
@@ -115,9 +126,17 @@ class ContactsController extends Controller
         }
     }
 
-    public function destroy(Request $request)
+    public function destroy($id)
     {
-        User::where('id',$request->contact_id)->delete();
-        return response()->json(['status' => true, 'message' => 'User delete']);
+        //
+    }
+    public function DeleteUserRecord(Request $request){
+        SellOrder::where('user_id',$request->id)->delete();
+        BuyOrder::where('user_id',$request->id)->delete();
+        Holding::where('user_id',$request->id)->delete();
+        matching::where('user_id',$request->id)->delete();
+
+        return response()->json(['status' => true, 'message' => 'All Records of this company are deleted']);
+
     }
 }
