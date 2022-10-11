@@ -9,13 +9,18 @@
         <!--  <span class=" item-name text-20 text-primary font-weight-700">GULL</span> -->
     </div>
 @endsection
+@section('filter')
+<button class="btn btn-secondary text-center mb-2" style="width: 95% !important; margin-left: 5px;" data-target="#addFilterModal" data-toggle="modal">
+    Filter
+</button>
+@endsection
 
 @section('side-bar-links')
 
     <div class="main-menu">
         <ul class="metismenu live-search-list" id="menu" style="height: 100vh!important; ">
-            @foreach($all_companies as $company)
-                <li class="Ul_li--hover {{request('search') == $company->company_id ? 'active' : ''}} d-flex align-items-center justify-content-between" >
+            @foreach($all_companies as $index=>$company)
+                <li class="Ul_li--hover @if($index==0) '' @else {{request('search') == $company->company_id ? 'active' : ''}} @endif d-flex align-items-center justify-content-between" >
                     <!-- company Name -->
                     <a href="{{url('companies?search=').$company->company_id}}">
                         <span class="item-name text-15 text-muted">{{$company->comp_name}}</span>
@@ -24,7 +29,7 @@
                 </li>
             @endforeach
             @if(auth()->user()->hasRole('Admin'))
-                <div class="Ul_li--hover text-center">
+                <div class="Ul_li--hover text-center mt-2">
                     <button type="button" class="text-muted btn btn-muted" data-toggle="modal"
                             data-target="#addCompanyModal">
                         +
@@ -66,7 +71,17 @@
                         <p class="font-weight-bold col-md-2">Business:</p>
                         <span class="col-md-4">{{ $active_company->business_id }}</span>
                         <p class="font-weight-bold col-md-2">Sector:</p>
-                        <span class="col-md-4">{{$active_company->Sector ? $active_company->Sector->sectorname :'N/A' }}</span>
+                        <?php $sector_edit_value='' ?>
+                        <span class="col-md-4">
+                            @if(count($active_company->Sectors) > 0)
+                                @foreach($active_company->Sectors as $item)
+                                {{$item->Sector ? $item->Sector->sectorname :'N/A' }},
+                                    <?php $sector_edit_value=$sector_edit_value.$item->Sector->sector_id.',' ?>
+                                @endforeach
+                                @else
+                                N/A
+                            @endif
+                        </span>
                     </div>
                     <div class="row">
                         <p class="font-weight-bold col-md-2">Background:</p>
@@ -205,11 +220,65 @@
                             @if(auth()->user()->hasRole('Admin'))
                                 <th>comments</th>
                             @endif
+                                <th>Action</th>
                         </tr>
                         </thead>
                     </table>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!--Add  filter Modal = -->
+    <div class="modal fade" id="addFilterModal" tabindex="-1" role="dialog"
+         aria-labelledby="addFilterModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <form action="{{url('company-filter')}}" method="post">
+                @csrf
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5>Filters</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 form-group">
+                            <label for="location">location</label>
+                            <select name="location_filter" id="location_filter" class="form-control">
+                                <option value="">No Filter</option>
+                                @foreach($locations as $location)
+                                    <option value="{{$location->geog_id}}" {{session()->has('filters') ? (session()->get('filters')['location_filter']== $location->geog_id ? 'selected' : '') : ''}}>{{$location->geogarea}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <label for="sectors">Sectors</label>
+                            <select name="sectors_filter[]" id="sectors_filter" class="select2-class" multiple="multiple" style="width: 100% !important;">
+                                @foreach($sectors as $sector)
+                                    <option value="{{$sector->sector_id}}" >{{$sector->sectorname}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <label for="business_filter">
+                                Business Model Orientation</label>
+                            <select name="business_filter" id="business_filter" class="form-control">
+                                <option value="">No Filter</option>
+                            @foreach($business as $bus)
+                                    <option value="{{$bus->business_id}}" {{session()->has('filters') ? (session()->get('filters')['business_filter']== $bus->business_id ? 'selected' : '') : ''}}>{{$bus->business_orient}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="filter">Apply Filter</button>
+                </div>
+            </div>
+            </form>
         </div>
     </div>
 
@@ -270,6 +339,62 @@
             </div>
         </div>
     </div>
+    <!--edit  Hold Modal = -->
+    <div class="modal fade" id="editHoldModal" tabindex="-1" role="dialog"
+         aria-labelledby="editHoldModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editHoldModalLabel">Edit Holding</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="edit_hold_contact">Contacts</label>
+                            <select name="hold_contact" id="edit_hold_contact" class="form-control">
+                                @foreach($contacts as $contact)
+                                    <option value="{{$contact->id}}">{{$contact->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="edit_holding">Holding</label>
+                            <input type="number" class="form-control" id="edit_holding">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="edit_hold_pps">PPS</label>
+                            <input type="number" class="form-control" id="edit_hold_pps">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="edit_hold_target">Target</label>
+                            <input type="number" class="form-control" id="edit_hold_target">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="edit_hold_share_class">Share Class</label>
+                            <select name="hold_share_class" id="edit_hold_share_class" class="form-control">
+                                @foreach($share_classes as $share_class)
+                                    <option value="{{$share_class->classname}}">{{$share_class->classname}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @if(auth()->user()->hasRole('Admin'))
+                            <div class="col-md-6 form-group">
+                                <label for="edit_hold_comment">Comments</label>
+                                <textarea name="hold_comment" class="form-control" id="edit_hold_comment"></textarea>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="updateHold">update changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!--Add Company Modal -->
     <div class="modal fade" id="addCompanyModal" tabindex="-1" role="dialog"
@@ -306,8 +431,12 @@
                             </select>
                         </div>
                         <div class="col-md-6 form-group">
+                            <label for="company_background">Background</label>
+                            <input type="text" class="form-control" id="company_background">
+                        </div>
+                        <div class="col-md-12 form-group">
                             <label for="sectors">Sectors</label>
-                            <select name="sectors" id="sectors" class="form-control">
+                            <select name="sectors[]" id="sectors" class="select2-class" multiple="multiple" style="width: 100% !important;">
                                 @foreach($sectors as $sector)
                                     <option value="{{$sector->sector_id}}">{{$sector->sectorname}}</option>
                                 @endforeach
@@ -325,10 +454,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-6 form-group">
-                            <label for="company_background">Background</label>
-                            <input type="text" class="form-control" id="company_background">
-                        </div>
+
                         @if(auth()->user()->hasRole('Admin'))
                         <div class="col-md-6 form-group">
                             <label for="comments">Comments</label>
@@ -379,8 +505,12 @@
                             </select>
                         </div>
                         <div class="col-md-6 form-group">
+                            <label for="company_background">Background</label>
+                            <input type="text" class="form-control" id="edit_company_background">
+                        </div>
+                        <div class="col-md-12 form-group">
                             <label for="sectors">Sectors</label>
-                            <select name="sectors" id="edit_sectors" class="form-control">
+                            <select name="sectors" id="edit_sectors" class="select2-class" multiple="multiple" style="width: 100% !important;">
                                 @foreach($sectors as $sector)
                                     <option value="{{$sector->sector_id}}">{{$sector->sectorname}}</option>
                                 @endforeach
@@ -398,10 +528,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-6 form-group">
-                            <label for="company_background">Background</label>
-                            <input type="text" class="form-control" id="edit_company_background">
-                        </div>
+
                         @if(auth()->user()->hasRole('Admin'))
                         <div class="col-md-6 form-group">
                             <label for="comment">Comments</label>
@@ -862,8 +989,10 @@
                     {data: 'pps', name: 'pps'},
                     {data: 'shareclass', name: 'shareclass'},
                     @if(auth()->user()->hasRole('Admin'))
-                    {data: 'comments', name: 'comments'}
+                    {data: 'comments', name: 'comments'},
                     @endif
+                    {data: 'action', name: 'action'}
+
                 ]
             });
         });
@@ -893,16 +1022,18 @@
                 }
             });
         });
-        $("#editButton").click(function () {
-            $('#edit_company_name').val('{{$active_company->comp_name}}')
-            $("#edit_location option[value=" + {{$active_company->geog_id}} + "]").prop("selected", true);
-            $("#edit_invest_stage option[value='{{$active_company->invest_stage}}']").prop("selected", true);
-            $("#edit_sectors option[value='{{$active_company->sector_id}}']").prop("selected", true);
-            $("#edit_business_orient option[value='{{$active_company->business_id}}']").prop("selected", true);
-            $('#edit_deal_type').val('{{$active_company->deal_type}}');
-            $('#edit_company_background').val('{{$active_company->background}}');
-            $('#edit_comment').val('{{$active_company->comment}}');
-        });
+        $(document).ready(function () {
+            $("#editButton").click(function () {
+                $('#edit_company_name').val('{{$active_company->comp_name}}')
+                $("#edit_location option[value=" + {{$active_company->geog_id}} + "]").prop("selected", true);
+                $("#edit_invest_stage option[value='{{$active_company->invest_stage}}']").prop("selected", true);
+                $("#edit_sectors").val([{{$sector_edit_value}}]).change();
+                $("#edit_business_orient option[value='{{$active_company->business_id}}']").prop("selected", true);
+                $('#edit_deal_type').val('{{$active_company->deal_type}}');
+                $('#edit_company_background').val('{{$active_company->background}}');
+                $('#edit_comment').val('{{$active_company->comment}}');
+            });
+        })
         $("#updateButton").click(function () {
             $.ajax({
                 type: "POST",
@@ -1207,7 +1338,49 @@
                     }
                 }
             });
-        })
+        });
+        let holdID=null;
+        function getHoldID(id) {
+            holdID = id;
+            $.ajax({
+                type: "GET",
+                url: "{{url('edit-holding')}}" + "/" + id,
+                success: function (res) {
+                    let result = res.data;
+                    $("#edit_hold_contact option[value=" + result.user_id + "]").prop("selected", true);
+                    $('#edit_holding').val(result.holding);
+                    $('#edit_hold_pps').val(result.pps);
+                    $('#edit_hold_target').val(result.target);
+                    $("#edit_hold_share_class option[value="+result.shareclass+"]").prop("selected", true);
+                    $('#edit_hold_comment').val(result.comments);
+                }
+            });
+        }
+
+        $('#updateHold').click(function () {
+            $.ajax({
+                type: "POST",
+                url: "{{url('update-holding')}}"+"/"+holdID,
+                data: {
+                    "_token": "{{csrf_token()}}",
+                    "hold_contact":$('#edit_hold_contact').val(),
+                    "holding":$('#edit_holding').val(),
+                    "hold_pps":$('#edit_hold_pps').val(),
+                    "hold_target":$('#edit_hold_target').val(),
+                    "hold_share_class":$('#edit_hold_share_class').val(),
+                    "hold_comment":$('#edit_hold_comment').val(),
+                    "company_id":"{{$active_company->company_id}}"
+                },
+                success: function (result) {
+                    if (result.status) {
+                        alert(result.message);
+                        window.location.reload();
+                    }
+                }
+            });
+
+        });
+
     </script>
     <!-- Search code -->
     <script>
@@ -1291,5 +1464,15 @@
                 });
             }
         }
+        @if(session()->has('filter_success'))
+            alert("{{session()->get('filter_success')}}");
+            @endif
+        @if(session()->has('filter_failed'))
+            alert("{{session()->get('filter_failed')}}");
+            @endif
+         @if(session()->has('filters'))
+          $('#sectors_filter').val({{implode(',',session()->get('filters')['sectors_filter'])}});
+            @endif
+
     </script>
 @endpush

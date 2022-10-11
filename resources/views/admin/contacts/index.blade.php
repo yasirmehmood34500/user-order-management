@@ -19,8 +19,8 @@
     <div class="main-menu">
         <ul class="metismenu live-search-list" id="menu">
             @if(auth()->user()->hasRole('Admin'))
-            @foreach($users as $user)
-                <li class="Ul_li--hover {{request('search') == $user->id ? 'active' : ''}}  d-flex align-items-center justify-content-between">
+            @foreach($users as $index=>$user)
+                <li class="Ul_li--hover @if($index==0) '' @else {{request('search') == $user->id ? 'active' : ''}} @endif   d-flex align-items-center justify-content-between">
                     <!-- User Name -->
                     <a href="{{url('contacts?search=').$user->id}}">
                         <span class="item-name text-15 text-muted">{{$user->name}}</span>
@@ -177,6 +177,7 @@
                             @if(auth()->user()->hasRole('Admin'))
                                 <th>comments</th>
                             @endif
+                            <th>Action</th>
                         </tr>
                         </thead>
                     </table>
@@ -204,6 +205,7 @@
                                 <th>Company</th>
                                 <th>EST Size</th>
                                 <th>PPS</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                     </table>
@@ -250,6 +252,46 @@
             </div>
         </div>
     </div>
+
+    <!--Edit  acq_targets Modal = -->
+    <div class="modal fade" id="editTargetModal" tabindex="-1" role="dialog"
+         aria-labelledby="editTargetModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editTargetModalLabel">Edit Target</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="edit_company_hold">Company</label>
+                            <select name="company_hold" id="edit_company_acq" class="form-control">
+                                @foreach($companies as $company)
+                                    <option value="{{$company->company_id}}">{{$company->comp_name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="edit_est_size_acq">EST Size</label>
+                            <input type="text" class="form-control" id="edit_est_size_acq">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="edit_pps_acq">PPS</label>
+                            <input type="text" class="form-control" id="edit_pps_acq">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="updateAcqTarget">Update Target</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!--Add  Hold Modal = -->
     <div class="modal fade" id="addHoldModal" tabindex="-1" role="dialog"
@@ -303,6 +345,62 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" id="saveHold">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--edit  Hold Modal = -->
+    <div class="modal fade" id="editHoldModal" tabindex="-1" role="dialog"
+         aria-labelledby="editHoldModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editHoldModalLabel">Edit Holding</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="edit_company_hold">Company</label>
+                            <select name="company_hold" id="edit_company_hold" class="form-control">
+                                @foreach($companies as $company)
+                                    <option value="{{$company->company_id}}">{{$company->comp_name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="edit_holding">Holding</label>
+                            <input type="number" class="form-control" id="edit_holding">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="edit_hold_pps">PPS</label>
+                            <input type="number" class="form-control" id="edit_hold_pps">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="edit_hold_target">Target</label>
+                            <input type="number" class="form-control" id="edit_hold_target">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="edit_hold_share_class">Share Class</label>
+                            <select name="hold_share_class" id="edit_hold_share_class" class="form-control">
+                                @foreach($share_classes as $share_class)
+                                    <option value="{{$share_class->classname}}">{{$share_class->classname}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @if(auth()->user()->hasRole('Admin'))
+                            <div class="col-md-6 form-group">
+                                <label for="edit_hold_comment">Comments</label>
+                                <textarea name="hold_comment" class="form-control" id="edit_hold_comment"></textarea>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="updateHold">update changes</button>
                 </div>
             </div>
         </div>
@@ -842,8 +940,10 @@
                     {data: 'pps', name: 'pps'},
                     {data: 'shareclass', name: 'shareclass'},
                         @if(auth()->user()->hasRole('Admin'))
-                    {data: 'comments', name: 'comments'}
+                    {data: 'comments', name: 'comments'},
                     @endif
+                    {data: 'action', name: 'action'}
+
                 ]
             });
             $('.acq_targets').DataTable({
@@ -860,6 +960,7 @@
                     {data: 'company', name: 'company'},
                     {data: 'estsize', name: 'estsize'},
                     {data: 'pps', name: 'pps'},
+                    {data: 'action', name: 'action'},
                 ]
             });
         });
@@ -1149,7 +1250,49 @@
                     }
                 }
             });
-        })
+        });
+        let holdID=null;
+        function getHoldID(id) {
+            holdID = id;
+            $.ajax({
+                type: "GET",
+                url: "{{url('edit-holding')}}" + "/" + id,
+                success: function (res) {
+                    let result = res.data;
+                    $("#edit_company_hold option[value=" + result.company_id + "]").prop("selected", true);
+                    $('#edit_holding').val(result.holding);
+                    $('#edit_hold_pps').val(result.pps);
+                    $('#edit_hold_target').val(result.target);
+                    $("#edit_hold_share_class option[value="+result.shareclass+"]").prop("selected", true);
+                    $('#edit_hold_comment').val(result.comments);
+                }
+            });
+        }
+
+        $('#updateHold').click(function () {
+            $.ajax({
+                type: "POST",
+                url: "{{url('update-holding')}}"+"/"+holdID,
+                data: {
+                    "_token": "{{csrf_token()}}",
+                    "hold_contact":"{{$active_user->id}}",
+                    "holding":$('#edit_holding').val(),
+                    "hold_pps":$('#edit_hold_pps').val(),
+                    "hold_target":$('#edit_hold_target').val(),
+                    "hold_share_class":$('#edit_hold_share_class').val(),
+                    "hold_comment":$('#edit_hold_comment').val(),
+                    "company_id":$('#edit_company_hold').val()
+                },
+                success: function (result) {
+                    if (result.status) {
+                        alert(result.message);
+                        window.location.reload();
+                    }
+                }
+            });
+
+        });
+
 
         $('#saveAcqTarget').click(function () {
             $.ajax({
@@ -1170,7 +1313,39 @@
                 }
             });
         })
-
+        let targetID=null;
+        function getTargetID(id) {
+            targetID = id;
+            $.ajax({
+                type: "GET",
+                url: "{{url('edit-acq-target')}}" + "/" + id,
+                success: function (res) {
+                    let result = res.data;
+                    $("#edit_company_acq option[value=" + result.company_id + "]").prop("selected", true);
+                    $('#edit_est_size_acq').val(result.estsize);
+                    $('#edit_pps_acq').val(result.pps);
+                }
+            });
+        }
+        $('#updateAcqTarget').click(function () {
+            $.ajax({
+                type: "POST",
+                url: "{{url('update-acq-target')}}"+"/"+targetID,
+                data: {
+                    "_token": "{{csrf_token()}}",
+                    "contact_acq":"{{$active_user->id}}",
+                    "company_acq":$('#edit_company_acq').val(),
+                    "est_size_acq":$('#edit_est_size_acq').val(),
+                    "pps_acq":$('#edit_pps_acq').val(),
+                },
+                success: function (result) {
+                    if (result.status) {
+                        alert(result.message);
+                        window.location.reload();
+                    }
+                }
+            });
+        })
     </script>
     <!-- Search code -->
     <script>

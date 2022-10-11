@@ -31,7 +31,7 @@ class PairedOrderController extends Controller
             return Datatables::of($pairs)
                 ->addIndexColumn()
                 ->addColumn('dt_id',function ($row){
-                    return '<i class="fa fa-trash text-danger fa--customer-icon" onclick="deletePair('.$row->match_id.')"> </i>'.($row->Company ? $row->Company->comp_name : 'N/A') . ' - B-'.$row->sell_id.' - S-'.$row->buy_id;
+                    return '<input type="checkbox" class="mr-4 ml-2 sub_check_boxes" id="sub_check_box'.$row->match_id.'" onclick="checkOneBox('.$row->match_id.')"/><i class="fa fa-trash text-danger fa--customer-icon" onclick="deletePair('.$row->match_id.')"> </i>'.($row->Company ? $row->Company->comp_name : 'N/A') . ' - B-'.$row->sell_id.' - S-'.$row->buy_id;
                 })
                 ->addColumn('dt_contacts', function($row){
                     $dt_contacts = ($row->BuyOrder ? ($row->BuyOrder->Contact ? $row->BuyOrder->Contact->name:'N/A') : 'N/A') .

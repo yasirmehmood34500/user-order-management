@@ -19,4 +19,8 @@ class Company extends Model
     public function Sector(){
         return $this->belongsTo(Sector::class, 'sector_id','sector_id');
     }
+
+    public function Sectors(){
+        return $this->hasMany(CompanyHasSectors::class, 'company_id','company_id');
+    }
 }

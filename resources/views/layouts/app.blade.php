@@ -14,6 +14,7 @@
     <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
         .fa--customer-icon{
             font-size: 14px !important;
@@ -105,6 +106,8 @@
     <script src="{{asset('dist-assets/js/scripts/echart.options.min.js')}}"></script>
     <script src="{{asset('dist-assets/js/scripts/dashboard.v1.script.min.js')}}"></script>
     <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script>
         function deleteFromGrid(id,ty) {
             let type = null;
@@ -135,6 +138,7 @@
                         'type':type
                     },
                     success: function (response) {
+                        alert(response.message);
                         if (type=='contact'){
                             location.href= "{{url('contacts')}}";
                         } else if(type=='company'){
@@ -149,7 +153,10 @@
             }
 
         }
-
+        // In your Javascript (external .js resource or <script> tag)
+        $(document).ready(function() {
+            $('.select2-class').select2();
+        });
     </script>
 
     @stack('js')

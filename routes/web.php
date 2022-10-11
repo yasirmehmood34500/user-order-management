@@ -62,12 +62,17 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('/save-acq-target', [App\Http\Controllers\AcqTargetController::class, 'store'])->name('acquistion-targets.store');
     Route::get('/acquistion-targets', [App\Http\Controllers\AcqTargetController::class, 'index'])->name('acquistion-targets');
     Route::get('/get-acquistion-targets', [App\Http\Controllers\AcqTargetController::class, 'getTargets'])->name('getTargets');
+    Route::get('/edit-acq-target/{id}', [App\Http\Controllers\AcqTargetController::class, 'edit']);
+    Route::post('/update-acq-target/{id}', [App\Http\Controllers\AcqTargetController::class, 'update']);
     Route::post('/save-holding', [App\Http\Controllers\CurrentHoldingController::class, 'store'])->name('current-holdings.store');
     Route::get('/get-holding', [App\Http\Controllers\CurrentHoldingController::class, 'getHoldings'])->name('current-holdings.getHoldings');
+    Route::get('/edit-holding/{id}', [App\Http\Controllers\CurrentHoldingController::class, 'editHolding']);
+    Route::post('/update-holding/{id}', [App\Http\Controllers\CurrentHoldingController::class, 'update']);
     Route::get('/current-holdings', [App\Http\Controllers\CurrentHoldingController::class, 'index'])->name('current-holdings');;
 
 
     Route::post('delete-from-grid',[\App\Http\Controllers\CompanyController::class,'DeleteFromGrid']);
     Route::post('delete-company-record',[\App\Http\Controllers\CompanyController::class,'DeleteCompanyRecord']);
     Route::post('delete-user-record',[\App\Http\Controllers\ContactsController::class,'DeleteUserRecord']);
+    Route::post('company-filter',[\App\Http\Controllers\CompanyController::class,'filterCompany']);
 });

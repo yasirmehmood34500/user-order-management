@@ -46,6 +46,13 @@ class CurrentHoldingController extends Controller
                     $data = $row->Company ? $row->Company->comp_name : 'N/A';
                     return $data;
                 })
+                ->addColumn('action', function($row){
+                    $deleteType = 3;
+                    $id=$row->holding_id;
+                    $btn = '<i class="fa fa-edit fa--customer-icon"  data-toggle="modal"  style="background-color: #dde1e5;"
+                    data-target="#editHoldModal" onclick="getHoldID('.$row->holding_id.')"></i>'.'<i class="fa fa-trash text-danger fa--customer-icon" onclick="deleteFromGrid('.$id.','.$deleteType.')"> </i>';
+                    return $btn;
+                })
                 ->rawColumns(['action', 'buy_id'])
                 ->make(true);
         }
@@ -81,48 +88,27 @@ class CurrentHoldingController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-        //
+        $holding = Holding::where('holding_id',$id)->update([
+            'company_id' => $request->company_id,
+            'user_id' => $request->hold_contact,
+            'holding' => $request->holding,
+            'pps' => $request->hold_pps,
+            'target' => $request->hold_target,
+            'shareclass' => $request->hold_share_class,
+            'comments' => $request->hold_comment,
+        ]);
+        if ($holding) {
+            return response()->json(['status' => true, 'message' => 'Holding updated']);
+        } else {
+            return response()->json(['status' => false, 'message' => 'Some thing went wrong']);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+    public function editHolding($id){
+        $holding = Holding::where('holding_id',$id)->first();
+        return response()->json(['status' => true, 'data' => $holding]);
+
     }
 }

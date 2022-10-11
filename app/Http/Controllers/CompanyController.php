@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AcqTarget;
 use App\Models\Business;
 use App\Models\BuyOrder;
 use App\Models\Company;
+use App\Models\CompanyHasSectors;
 use App\Models\Holding;
 use App\Models\Location;
 use App\Models\matching;
@@ -14,6 +16,7 @@ use App\Models\SellOrder;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 
 class CompanyController extends Controller
@@ -21,7 +24,33 @@ class CompanyController extends Controller
 
     public function index()
     {
-        $companies = Company::orderBy('comp_name','ASC')->get();
+        $companies=[];
+        if (\session()->has('filters')){
+            if (!is_null(\session()->get('filters')['location_filter']) && !is_null(\session()->get('filters')['sectors_filter']) && !is_null(\session()->get('filters')['business_filter'])){
+                $companies =Company::with(['Sectors.Sector'])->where('geog_id',\session()->get('filters')['location_filter'])->whereHas('Sectors',function ($q){
+                    $q->whereIn('sector_id',\session()->get('filters')['sectors_filter']);
+                })->where('business_id',\session()->get('filters')['business_filter'])->orderBy('comp_name', 'ASC')->get();
+            }
+            elseif (!is_null(\session()->get('filters')['location_filter']) && !is_null(\session()->get('filters')['sectors_filter'])){
+                $companies =Company::with(['Sectors.Sector'])->where('geog_id',\session()->get('filters')['location_filter'])->whereHas('Sectors',function ($q){
+                    $q->whereIn('sector_id',\session()->get('filters')['sectors_filter']);
+                })->orderBy('comp_name', 'ASC')->get();
+            }
+            elseif (!is_null(\session()->get('filters')['location_filter'])){
+//            dd(\session()->get('filters'));
+                $companies =Company::with(['Sectors.Sector'])->where('geog_id',\session()->get('filters')['location_filter'])->orderBy('comp_name', 'ASC')->get();
+            }elseif (!is_null(\session()->get('filters')['sectors_filter'])){
+                $companies =Company::with(['Sectors.Sector'])->whereHas('Sectors',function ($q){
+                    $q->whereIn('sector_id',\session()->get('filters')['sectors_filter']);
+                })->orderBy('comp_name', 'ASC')->get();
+
+            }elseif (!is_null(\session()->get('filters')['business_filter'])){
+                $companies = Company::with(['Sectors.Sector'])->where('business_id',\session()->get('filters')['business_filter'])->orderBy('comp_name', 'ASC')->get();
+            }
+        }else{
+            $companies = Company::with(['Sectors.Sector'])->orderBy('comp_name', 'ASC')->get();
+        }
+
         $sectors = Sector::all();
         $business = Business::all();
         $locations = Location::all();
@@ -32,9 +61,9 @@ class CompanyController extends Controller
             $q->where('name','User');
         })->get();
         if (\request('search')){
-            $activeCompany = Company::where('company_id',\request('search'))->first();
+            $activeCompany = Company::with(['Sectors.Sector'])->where('company_id',\request('search'))->first();
         } else {
-            $activeCompany = $companies[0];
+            $activeCompany = count($companies) > 0 ?  $companies[0] : '';
         }
 
 
@@ -49,8 +78,7 @@ class CompanyController extends Controller
             'structures'=>$structures,
             'contacts'=>$users
         ];
-
-        return view('admin.companies.index',$data);
+            return view('admin.companies.index', $data);
     }
 
     /**
@@ -77,11 +105,16 @@ class CompanyController extends Controller
             'geog_id'=>$request->location,
             'invest_stage'=>$request->invest_stage,
             'comment'=>$request->comment,
-            'sector_id'=>$request->sectors,
             'business_id'=>$request->business_orient,
             'deal_type'=>$request->deal_type,
             'background'=>$request->company_background
         ]);
+        foreach ($request->sectors as $sector){
+            CompanyHasSectors::create([
+                'company_id' =>$company->id,
+                'sector_id' =>$sector,
+            ]);
+        }
 
         if ($company) {
             return response()->json(['status' => true, 'message' => 'company saved']);
@@ -113,7 +146,13 @@ class CompanyController extends Controller
             'deal_type'=>$request->deal_type,
             'background'=>$request->company_background
         ]);
-
+        CompanyHasSectors::where('company_id',$id)->delete();
+        foreach ($request->sectors as $sector){
+            CompanyHasSectors::create([
+                'company_id' =>$id,
+                'sector_id' =>$sector,
+            ]);
+        }
         if ($company) {
             return response()->json(['status' => true, 'message' => 'company updated']);
         }else{
@@ -145,17 +184,19 @@ class CompanyController extends Controller
         }elseif($type=='company'){
             Company::where('company_id',$id)->delete();
             return response()->json(['status' => true, 'message' => 'Company Deleted']);
-
         }elseif($type=='contact'){
-            User::where('id',$id)->delete();
-            return response()->json(['status' => true, 'message' => 'contact Deleted']);
-
+            if ($id!=1) {
+                User::where('id', $id)->delete();
+                return response()->json(['status' => true, 'message' => 'Contact Deleted']);
+            }else{
+                return response()->json(['status' => true, 'message' => 'Admin Account not allow to Delete']);
+            }
         }elseif($type=='holding'){
-            User::where('id',$id)->delete();
-            return response()->json(['status' => true, 'message' => 'holding Deleted']);
+            Holding::where('holding_id',$id)->delete();
+            return response()->json(['status' => true, 'message' => 'Holding Deleted']);
         }elseif($type=='target'){
-            User::where('id',$id)->delete();
-            return response()->json(['status' => true, 'message' => 'target Deleted']);
+            AcqTarget::where('target_id',$id)->delete();
+            return response()->json(['status' => true, 'message' => 'Target Deleted']);
         }
 
     }
@@ -168,5 +209,22 @@ class CompanyController extends Controller
 
         return response()->json(['status' => true, 'message' => 'All Records of this company are deleted']);
 
+    }
+
+    public function filterCompany(Request $request){
+//        dd($request->all());
+        if ($request->location_filter || $request->sectors_filter || $request->business_filter) {
+            $filters = [
+                'location_filter' => $request->location_filter,
+                'sectors_filter' => array_values($request->sectors_filter),
+                'business_filter' => $request->business_filter
+            ];
+            Session::put('filters', $filters);
+
+            return redirect('companies')->with(['filter_success' => 'Filter Applied']);
+        } else {
+            Session::forget('filters');
+            return redirect('companies')->with(['filter_failed' => 'All filters Removed']);
+        }
     }
 }
