@@ -1349,22 +1349,45 @@
     </script>
     <!-- Search code -->
     <script>
-        $(document).ready(function ($) {
-            $('.live-search-list li a span').each(function () {
-                $(this).attr('data-search-term', $(this).text().toLowerCase());
-            });
+        // $(document).ready(function ($) {
+        //     $('.live-search-list li a span').each(function () {
+        //         $(this).attr('data-search-term', $(this).text().toLowerCase());
+        //     });
+        //
+        //     $('.live-search-box').on('keyup', function () {
+        //
+        //         var searchTerm = $(this).val().toLowerCase();
+        //         $('.live-search-list li ').each(function () {
+        //             if ($(this).find('a span').filter('[data-search-term *= ' + searchTerm + ']').length > 0 || searchTerm.length < 1) {
+        //                 $(this).show();
+        //             } else {
+        //                 $(this).hide();
+        //             }
+        //         });
+        //     });
+        // });
+        $('.live-search-box').on('keyup',function () {
+            var input, filter, ul, li, a, i, txtValue;
+            input = document.getElementById("search");
+            filter = input.value.toUpperCase();
+            ul = document.getElementById("menu");
+            li = ul.getElementsByTagName("li");
 
-            $('.live-search-box').on('keyup', function () {
+            for (i = 0; i < li.length; i++) {
+                let  outerA = li[i].getElementsByTagName("a")[0];
+                a = outerA.getElementsByTagName('span')[0];
+                console.log(a);
+                txtValue = a.textContent || a.innerText;
+                console.log(txtValue + " filter "+filter);
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    console.log("match");
+                    li[i].setAttribute('class','d-flex align-items-center justify-content-between');
+                } else {
+                    console.log("not match");
 
-                var searchTerm = $(this).val().toLowerCase();
-                $('.live-search-list li ').each(function () {
-                    if ($(this).find('a span').filter('[data-search-term *= ' + searchTerm + ']').length > 0 || searchTerm.length < 1) {
-                        $(this).show();
-                    } else {
-                        $(this).hide();
-                    }
-                });
-            });
+                    li[i].setAttribute('class','d-none');
+                }
+            }
         });
         function deleteUserRecord() {
             var result = confirm("Are you sure you want to delete all Record of Contact?");

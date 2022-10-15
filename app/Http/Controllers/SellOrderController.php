@@ -72,6 +72,9 @@ class SellOrderController extends Controller
             }
             return Datatables::of($data)
                 ->addIndexColumn()
+                ->addColumn('checkbox',function ($row){
+                    return '<input type="checkbox" class="mr-0 ml-2 sub_check_boxes" id="sub_check_box'.$row->sell_id.'" onclick="checkOneBox('.$row->sell_id.')"/>';
+                })
                 ->addColumn('sell_id', function($row){
                     if (auth()->user()->hasRole('Admin')) {
                         $pair_icon = '<i class="fa-solid fa-code-merge text-danger fa--customer-icon"  data-toggle="modal"
@@ -97,7 +100,7 @@ class SellOrderController extends Controller
 //                        data-target="#editSOModal" onclick="getSO_ID('.$row->sell_id.')">Edit</a>';
                     return $btn;
                 })
-                ->rawColumns(['action','sell_id'])
+                ->rawColumns(['action','sell_id','checkbox'])
                 ->make(true);
         }
     }

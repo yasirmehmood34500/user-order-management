@@ -78,7 +78,9 @@ class BuyOrderController extends Controller
             }
             return Datatables::of($data)
                 ->addIndexColumn()
-
+                ->addColumn('checkbox',function ($row){
+                    return '<input type="checkbox" class="mr-0 ml-2 sub_check_boxes" id="sub_check_box'.$row->buy_id.'" onclick="checkOneBox('.$row->buy_id.')"/>';
+                })
                 ->addColumn('buy_id', function($row) {
                     if (auth()->user()->hasRole('Admin')){
                         $pair_icon = '<i class="fa-solid fa-code-merge text-danger fa--customer-icon"  data-toggle="modal"
@@ -104,7 +106,7 @@ class BuyOrderController extends Controller
                     data-target="#editBuyModal" onclick="getBuyID('.$row->buy_id.')"></i>'.'<i class="fa fa-trash text-danger fa--customer-icon" onclick="deleteFromGrid('.$id.','.$deleteType.')"> </i>';
                 return $btn;
                 })
-                ->rawColumns(['action','buy_id'])
+                ->rawColumns(['action','buy_id','checkbox'])
                 ->make(true);
         }
     }

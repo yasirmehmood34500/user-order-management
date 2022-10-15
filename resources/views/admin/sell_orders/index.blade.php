@@ -19,10 +19,11 @@
                     </div>
                 </div>
 
-                <div class="card-body">
+                <div class="card-body table-responsive">
                     <table class="table table-bordered sell-orders">
                         <thead>
-                        <tr>
+                        <tr class="export_row" id="head_tr">
+                            <th><input type="checkbox" class="" id="checkAll"/></th>
                             <th>ID</th>
                             <th>Company</th>
                             <th>User Profile</th>
@@ -322,6 +323,7 @@
                     {{--}--}}
                 },
                 columns: [
+                    {data: 'checkbox', name: 'checkbox',orderable: false},
                     {data: 'sell_id', name: 'sell_id'},
                     {data: 'company', name: 'company'},
                     {data: 'contact', name: 'contact'},
@@ -477,18 +479,46 @@
 
 
     </script>
+    <script>
+        $('#checkAll').on('click',function () {
+            const sub_check_boxes = document.querySelectorAll(".sub_check_boxes");
+            if($(this).is(":checked")){
+                $('.sell-orders tbody tr').addClass('export_row');
+                $('.sub_check_boxes').prop('checked',true);
+                // $('#head_tr').addClass('export_row');
 
+            }else{
+                $('.sell-orders tbody tr').removeClass('export_row');
+                $('.sub_check_boxes').prop('checked',false);
+                // $('#head_tr').addClass('export_row');
+
+
+            }
+        });
+        function checkOneBox(id) {
+            if($('#sub_check_box'+id).is(":checked")) {
+                let gr_p = $('#sub_check_box'+id).parent();
+                gr_p.parent().addClass('export_row');
+            }else{
+                let gr_p = $('#sub_check_box'+id).parent();
+                gr_p.parent().removeClass('export_row');
+            }
+        }
+
+    </script>
     <script>
         function exportTableToCSV(filename) {
             var csv = [];
-            var rows = document.querySelectorAll(".sell-orders tr");
+            var rows = document.querySelectorAll(".export_row");
 
             for (var i = 0; i < rows.length; i++) {
                 var row = [],
                     cols = rows[i].querySelectorAll("td, th");
 
-                for (var j = 0; j < cols.length-1 ; j++)
+                for (var j = 1; j < cols.length-1 ; j++) {
+                    console.log(cols[j]);
                     row.push(cols[j].innerText);
+                }
 
                 csv.push(row.join(","));
             }
@@ -525,4 +555,5 @@
             downloadLink.click();
         }
     </script>
+
 @endpush

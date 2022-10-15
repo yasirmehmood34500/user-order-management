@@ -40,8 +40,8 @@
     </div>
 @endsection
 
-
 @section('content')
+@if($active_company)
     <div class="row justify-content-center mb-5">
         <div class="col-md-12">
             <div class="card">
@@ -69,7 +69,7 @@
                     </div>
                     <div class="row">
                         <p class="font-weight-bold col-md-2">Business:</p>
-                        <span class="col-md-4">{{ $active_company->business_id }}</span>
+                        <span class="col-md-4">{{ $active_company->Business->business_orient }}</span>
                         <p class="font-weight-bold col-md-2">Sector:</p>
                         <?php $sector_edit_value='' ?>
                         <span class="col-md-4">
@@ -228,6 +228,7 @@
             </div>
         </div>
     </div>
+
 
     <!--Add  filter Modal = -->
     <div class="modal fade" id="addFilterModal" tabindex="-1" role="dialog"
@@ -908,571 +909,657 @@
             </div>
         </div>
     </div>
-@endsection
+    @push('js')
+        <script type="text/javascript">
 
-@push('js')
-    <script type="text/javascript">
+            $(function () {
+                var table = $('.buy-orders').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url:"{{ route('buyOrders') }}",
+                        data: function (d) {
+                            d.id = "{{$active_company->company_id}}";
+                            d.filter_orders_of = "company";
+                        }
+                    },
+                    columns: [
+                        {data: 'buy_id', name: 'buy_id'},
+                        // {data: 'company', name: 'company'},
+                        {data: 'contact', name: 'contact'},
+                        {data: 'estsize', name: 'estsize'},
+                        {data: 'pps', name: 'pps'},
+                        {data: 'valuation', name: 'valuation'},
+                        {data: 'shareclass', name: 'shareclass'},
+                        {data: 'structure', name: 'structure'},
+                            @if(auth()->user()->hasRole('Admin'))
+                        {data: 'fee_structure', name: 'fee_structure'},
+                        {data: 'comments', name: 'comments'},
+                            @endif
+                        {data: 'action', name: 'action', orderable: false, searchable: false},
+                    ]
+                });
 
-        $(function () {
-            var table = $('.buy-orders').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url:"{{ route('buyOrders') }}",
-                    data: function (d) {
-                        d.id = "{{$active_company->company_id}}";
-                        d.filter_orders_of = "company";
+            });
+
+            $(function () {
+                $('.sell-orders').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url:"{{ route('sellOrders') }}",
+                        data: function (d) {
+                            d.id = "{{$active_company->company_id}}";
+                            d.filter_orders_of = "company";
+                        }
+                    },
+                    columns: [
+                        {data: 'sell_id', name: 'sell_id'},
+                        // {data: 'company', name: 'company'},
+                        {data: 'contact', name: 'contact'},
+                        {data: 'estsize', name: 'estsize'},
+                        {data: 'pps', name: 'pps'},
+                        {data: 'valuation', name: 'valuation'},
+                        {data: 'shareclass', name: 'shareclass'},
+                        {data: 'structure', name: 'structure'},
+                            @if(auth()->user()->hasRole('Admin'))
+                        {data: 'fee_structure', name: 'fee_structure'},
+                        {data: 'comments', name: 'comments'},
+                            @endif
+                        {data: 'action', name: 'action', orderable: false, searchable: false},
+                    ]
+                });
+                $('.holdings').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url:"{{ route('current-holdings.getHoldings') }}",
+                        data: function (d) {
+                            d.id = "{{$active_company->company_id}}";
+                            d.filter_orders_of = "company";
+                        }
+                    },
+                    columns: [
+                        {data: 'holding_id', name: 'holding_id'},
+                        // {data: 'company', name: 'company'},
+                        {data: 'contact', name: 'contact'},
+                        {data: 'holding', name: 'holding'},
+                        {data: 'target', name: 'target'},
+                        {data: 'pps', name: 'pps'},
+                        {data: 'shareclass', name: 'shareclass'},
+                            @if(auth()->user()->hasRole('Admin'))
+                        {data: 'comments', name: 'comments'},
+                            @endif
+                        {data: 'action', name: 'action'}
+
+                    ]
+                });
+            });
+        </script>
+        <script>
+            {{--        Company--}}
+            $("#saveButton").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "{{url('save-company')}}",
+                    data: {
+                        "_token": "{{csrf_token()}}",
+                        "company_name": $('#company_name').val(),
+                        "location": $('#location').val(),
+                        "invest_stage": $('#invest_stage').val(),
+                        "sectors": $('#sectors').val(),
+                        "deal_type": $('#deal_type').val(),
+                        "business_orient": $('#business_orient').val(),
+                        "company_background": $('#company_background').val(),
+                        "comment": $('#comment').val(),
+                    },
+                    success: function (result) {
+                        if (result.status) {
+                            alert(result.message);
+                            window.location.reload();
+                        }
                     }
-                },
-                columns: [
-                    {data: 'buy_id', name: 'buy_id'},
-                    // {data: 'company', name: 'company'},
-                    {data: 'contact', name: 'contact'},
-                    {data: 'estsize', name: 'estsize'},
-                    {data: 'pps', name: 'pps'},
-                    {data: 'valuation', name: 'valuation'},
-                    {data: 'shareclass', name: 'shareclass'},
-                    {data: 'structure', name: 'structure'},
-                    @if(auth()->user()->hasRole('Admin'))
-                    {data: 'fee_structure', name: 'fee_structure'},
-                    {data: 'comments', name: 'comments'},
-                    @endif
-                    {data: 'action', name: 'action', orderable: false, searchable: false},
-                ]
+                });
             });
-
-        });
-
-        $(function () {
-             $('.sell-orders').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url:"{{ route('sellOrders') }}",
-                    data: function (d) {
-                        d.id = "{{$active_company->company_id}}";
-                        d.filter_orders_of = "company";
+            $(document).ready(function () {
+                $("#editButton").click(function () {
+                    $('#edit_company_name').val('{{$active_company->comp_name}}')
+                    $("#edit_location option[value=" + {{$active_company->geog_id}} + "]").prop("selected", true);
+                    $("#edit_invest_stage option[value='{{$active_company->invest_stage}}']").prop("selected", true);
+                    $("#edit_sectors").val([{{$sector_edit_value}}]).change();
+                    $("#edit_business_orient option[value='{{$active_company->business_id}}']").prop("selected", true);
+                    $('#edit_deal_type').val('{{$active_company->deal_type}}');
+                    $('#edit_company_background').val('{{$active_company->background}}');
+                    $('#edit_comment').val('{{$active_company->comment}}');
+                });
+            })
+            $("#updateButton").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "{{url('update-company')}}"+"/"+{{$active_company->company_id}},
+                    data: {
+                        "_token": "{{csrf_token()}}",
+                        "company_name": $('#edit_company_name').val(),
+                        "location": $("#edit_location").val(),
+                        "invest_stage": $("#edit_invest_stage").val(),
+                        "sectors": $('#edit_sectors').val(),
+                        "deal_type": $('#edit_deal_type').val(),
+                        "business_orient": $('#edit_business_orient').val(),
+                        "company_background": $('#edit_company_background').val(),
+                        "comment": $('#edit_comment').val(),
+                    },
+                    success: function (result) {
+                        if (result.status) {
+                            alert(result.message);
+                            window.location.reload();
+                        }
                     }
-                },
-                columns: [
-                    {data: 'sell_id', name: 'sell_id'},
-                    // {data: 'company', name: 'company'},
-                    {data: 'contact', name: 'contact'},
-                    {data: 'estsize', name: 'estsize'},
-                    {data: 'pps', name: 'pps'},
-                    {data: 'valuation', name: 'valuation'},
-                    {data: 'shareclass', name: 'shareclass'},
-                    {data: 'structure', name: 'structure'},
-                    @if(auth()->user()->hasRole('Admin'))
-                    {data: 'fee_structure', name: 'fee_structure'},
-                    {data: 'comments', name: 'comments'},
-                    @endif
-                    {data: 'action', name: 'action', orderable: false, searchable: false},
-                ]
+                });
             });
-            $('.holdings').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url:"{{ route('current-holdings.getHoldings') }}",
-                    data: function (d) {
-                        d.id = "{{$active_company->company_id}}";
-                        d.filter_orders_of = "company";
-                    }
-                },
-                columns: [
-                    {data: 'holding_id', name: 'holding_id'},
-                    // {data: 'company', name: 'company'},
-                    {data: 'contact', name: 'contact'},
-                    {data: 'holding', name: 'holding'},
-                    {data: 'target', name: 'target'},
-                    {data: 'pps', name: 'pps'},
-                    {data: 'shareclass', name: 'shareclass'},
-                    @if(auth()->user()->hasRole('Admin'))
-                    {data: 'comments', name: 'comments'},
-                    @endif
-                    {data: 'action', name: 'action'}
+        </script>
 
-                ]
-            });
-        });
-    </script>
-    <script>
-{{--        Company--}}
-        $("#saveButton").click(function () {
-            $.ajax({
-                type: "POST",
-                url: "{{url('save-company')}}",
-                data: {
-                    "_token": "{{csrf_token()}}",
-                    "company_name": $('#company_name').val(),
-                    "location": $('#location').val(),
-                    "invest_stage": $('#invest_stage').val(),
-                    "sectors": $('#sectors').val(),
-                    "deal_type": $('#deal_type').val(),
-                    "business_orient": $('#business_orient').val(),
-                    "company_background": $('#company_background').val(),
-                    "comment": $('#comment').val(),
-                },
-                success: function (result) {
-                    if (result.status) {
-                        alert(result.message);
-                        window.location.reload();
+        <script>
+            let BuyOrderID = '';
+            $("#saveBuyButton").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "{{url('save-buy-order')}}",
+                    data: {
+                        "_token": "{{csrf_token()}}",
+                        "contact": $('#contact').val(),
+                        "company": "{{$active_company->company_id}}",
+                        "category": $('#category').val(),
+                        "price": $('#price').val(),
+                        "fee_structure": $('#fee_structure').val(),
+                        "est_size": $('#est_size').val(),
+                        "share_class": $('#share_class').val(),
+                        "structure": $('#structure').val(),
+                        "bo_comment": $('#bo_comment').val(),
+                    },
+                    success: function (result) {
+                        if (result.status) {
+                            alert(result.message);
+                            window.location.reload();
+                        }
                     }
-                }
+                });
             });
-        });
-        $(document).ready(function () {
-            $("#editButton").click(function () {
-                $('#edit_company_name').val('{{$active_company->comp_name}}')
-                $("#edit_location option[value=" + {{$active_company->geog_id}} + "]").prop("selected", true);
-                $("#edit_invest_stage option[value='{{$active_company->invest_stage}}']").prop("selected", true);
-                $("#edit_sectors").val([{{$sector_edit_value}}]).change();
-                $("#edit_business_orient option[value='{{$active_company->business_id}}']").prop("selected", true);
-                $('#edit_deal_type').val('{{$active_company->deal_type}}');
-                $('#edit_company_background').val('{{$active_company->background}}');
-                $('#edit_comment').val('{{$active_company->comment}}');
-            });
-        })
-        $("#updateButton").click(function () {
-            $.ajax({
-                type: "POST",
-                url: "{{url('update-company')}}"+"/"+{{$active_company->company_id}},
-                data: {
-                    "_token": "{{csrf_token()}}",
-                    "company_name": $('#edit_company_name').val(),
-                    "location": $("#edit_location").val(),
-                    "invest_stage": $("#edit_invest_stage").val(),
-                    "sectors": $('#edit_sectors').val(),
-                    "deal_type": $('#edit_deal_type').val(),
-                    "business_orient": $('#edit_business_orient').val(),
-                    "company_background": $('#edit_company_background').val(),
-                    "comment": $('#edit_comment').val(),
-                },
-                success: function (result) {
-                    if (result.status) {
-                        alert(result.message);
-                        window.location.reload();
+            function getBuyID(id) {
+                BuyOrderID = id;
+                $.ajax({
+                    type: "GET",
+                    url: "{{url('edit-buy-order')}}" + "/" + id,
+                    success: function (res) {
+                        let result = res.data;
+                        $('#edit_price').val(result.pps);
+                        $('#edit_fee_structure').val(result.fee_structure);
+                        $('#edit_est_size').val(result.estsize);
+                        $('#edit_bo_comment').val(result.comments);
+                        $("#edit_contact option[value=" + result.user_id + "]").prop("selected", true);
+                        $("#edit_category option[value="+result.category_id+"]").prop("selected", true);
+                        $("#edit_share_class option[value="+result.shareclass+"]").prop("selected", true);
+                        $("#edit_structure option[value='"+result.structure+"']").prop("selected", true);
                     }
-                }
-            });
-        });
-    </script>
-
-    <script>
-        let BuyOrderID = '';
-        $("#saveBuyButton").click(function () {
-            $.ajax({
-                type: "POST",
-                url: "{{url('save-buy-order')}}",
-                data: {
-                    "_token": "{{csrf_token()}}",
-                    "contact": $('#contact').val(),
-                    "company": "{{$active_company->company_id}}",
-                    "category": $('#category').val(),
-                    "price": $('#price').val(),
-                    "fee_structure": $('#fee_structure').val(),
-                    "est_size": $('#est_size').val(),
-                    "share_class": $('#share_class').val(),
-                    "structure": $('#structure').val(),
-                    "bo_comment": $('#bo_comment').val(),
-                },
-                success: function (result) {
-                    if (result.status) {
-                        alert(result.message);
-                        window.location.reload();
-                    }
-                }
-            });
-        });
-        function getBuyID(id) {
-            BuyOrderID = id;
-            $.ajax({
-                type: "GET",
-                url: "{{url('edit-buy-order')}}" + "/" + id,
-                success: function (res) {
-                    let result = res.data;
-                    $('#edit_price').val(result.pps);
-                    $('#edit_fee_structure').val(result.fee_structure);
-                    $('#edit_est_size').val(result.estsize);
-                    $('#edit_bo_comment').val(result.comments);
-                    $("#edit_contact option[value=" + result.user_id + "]").prop("selected", true);
-                    $("#edit_category option[value="+result.category_id+"]").prop("selected", true);
-                    $("#edit_share_class option[value="+result.shareclass+"]").prop("selected", true);
-                    $("#edit_structure option[value='"+result.structure+"']").prop("selected", true);
-                }
-            });
-        }
-        $("#updateBuyButton").click(function () {
-            $.ajax({
-                type: "POST",
-                url: "{{url('update-buy-order')}}"+"/"+BuyOrderID,
-                data: {
-                    "_token": "{{csrf_token()}}",
-                    "contact": $('#edit_contact').val(),
-                    "company": "{{$active_company->company_id}}",
-                    "category": $('#edit_category').val(),
-                    "price": $('#edit_price').val(),
-                    "fee_structure": $('#edit_fee_structure').val(),
-                    "est_size": $('#edit_est_size').val(),
-                    "share_class": $('#edit_share_class').val(),
-                    "structure": $('#edit_structure').val(),
-                    "bo_comment": $('#edit_bo_comment').val(),
-                },
-                success: function (result) {
-                    if (result.status) {
-                        alert(result.message);
-                        window.location.reload();
-                    }
-                }
-            });
-        });
-
-        function pairOrder(id) {
-            BuyOrderID=id;
-            console.log(id);
-            $('.make-so-pair tbody').html(' ');
-
-            $('.make-so-pair').DataTable({
-                processing: true,
-                serverSide: true,
-                "bDestroy": true,
-                ajax: {
-                    url:"{{ route('forPairSellOrders') }}",
-                    data: function (d) {
-                        d.id = "{{$active_company->company_id}}";
-                        d.filter_orders_of = "company";
-                    }
-                },
-                columns: [
-                    {data: 'sell_checkbox', name: 'sell_checkbox'},
-                    {data: 'contact', name: 'contact'},
-                    {data: 'estsize', name: 'estsize'},
-                    {data: 'pps', name: 'pps'},
-                    {data: 'valuation', name: 'valuation'},
-                ]
-            });
-        }
-
-        function pairSellOrder(id) {
-            SOOrderID=id;
-
-            console.log(id);
-            $('.make-bo-pair tbody').html(' ');
-
-            $('.make-bo-pair').DataTable({
-                processing: true,
-                serverSide: true,
-                "bDestroy": true,
-                ajax: {
-                    url:"{{ route('forPairBuyOrders') }}",
-                    data: function (d) {
-                        d.id = "{{$active_company->company_id}}";
-                        d.filter_orders_of = "company";
-                    }
-                },
-                columns: [
-                    {data: 'sell_checkbox', name: 'sell_checkbox'},
-                    {data: 'contact', name: 'contact'},
-                    {data: 'estsize', name: 'estsize'},
-                    {data: 'pps', name: 'pps'},
-                    {data: 'valuation', name: 'valuation'},
-                ]
-            });
-        }
-        let so_arr=[];
-        function selectSO(id){
-            if(!so_arr.includes(id)){          //checking weather array contain the id
-                so_arr.push(id);               //adding to array because value doesnt exists
-            }else{
-                so_arr.splice(so_arr.indexOf(id), 1);  //deleting
+                });
             }
-            // arr.push(id);
-            console.log(so_arr);
-        }
-        let bo_arr=[];
-        function selectBO(id){
-            console.log(id)
-            if(!bo_arr.includes(id)){          //checking weather array contain the id
-                bo_arr.push(id);               //adding to array because value doesnt exists
-            }else{
-                bo_arr.splice(bo_arr.indexOf(id), 1);  //deleting
+            $("#updateBuyButton").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "{{url('update-buy-order')}}"+"/"+BuyOrderID,
+                    data: {
+                        "_token": "{{csrf_token()}}",
+                        "contact": $('#edit_contact').val(),
+                        "company": "{{$active_company->company_id}}",
+                        "category": $('#edit_category').val(),
+                        "price": $('#edit_price').val(),
+                        "fee_structure": $('#edit_fee_structure').val(),
+                        "est_size": $('#edit_est_size').val(),
+                        "share_class": $('#edit_share_class').val(),
+                        "structure": $('#edit_structure').val(),
+                        "bo_comment": $('#edit_bo_comment').val(),
+                    },
+                    success: function (result) {
+                        if (result.status) {
+                            alert(result.message);
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+
+            function pairOrder(id) {
+                BuyOrderID=id;
+                console.log(id);
+                $('.make-so-pair tbody').html(' ');
+
+                $('.make-so-pair').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    "bDestroy": true,
+                    ajax: {
+                        url:"{{ route('forPairSellOrders') }}",
+                        data: function (d) {
+                            d.id = "{{$active_company->company_id}}";
+                            d.filter_orders_of = "company";
+                        }
+                    },
+                    columns: [
+                        {data: 'sell_checkbox', name: 'sell_checkbox'},
+                        {data: 'contact', name: 'contact'},
+                        {data: 'estsize', name: 'estsize'},
+                        {data: 'pps', name: 'pps'},
+                        {data: 'valuation', name: 'valuation'},
+                    ]
+                });
             }
-            // arr.push(id);
-            console.log(bo_arr , 'sdasd');
-        }
-    </script>
-    <script>
-        let SOOrderID = '';
-        $("#saveSOButton").click(function () {
-            $.ajax({
-                type: "POST",
-                url: "{{url('save-sale-order')}}",
-                data: {
-                    "_token": "{{csrf_token()}}",
-                    "contact": $('#so_contact').val(),
-                    "company": "{{$active_company->company_id}}",
-                    "category": $('#so_category').val(),
-                    "price": $('#so_price').val(),
-                    "est_size": $('#so_est_size').val(),
-                    "share_class": $('#so_share_class').val(),
-                    "structure": $('#so_structure').val(),
-                    "fee_structure": $('#so_fee_structure').val(),
-                    "bo_comment": $('#so_comment').val(),
-                },
-                success: function (result) {
-                    if (result.status) {
-                        alert(result.message);
-                        window.location.reload();
+
+            function pairSellOrder(id) {
+                SOOrderID=id;
+
+                console.log(id);
+                $('.make-bo-pair tbody').html(' ');
+
+                $('.make-bo-pair').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    "bDestroy": true,
+                    ajax: {
+                        url:"{{ route('forPairBuyOrders') }}",
+                        data: function (d) {
+                            d.id = "{{$active_company->company_id}}";
+                            d.filter_orders_of = "company";
+                        }
+                    },
+                    columns: [
+                        {data: 'sell_checkbox', name: 'sell_checkbox'},
+                        {data: 'contact', name: 'contact'},
+                        {data: 'estsize', name: 'estsize'},
+                        {data: 'pps', name: 'pps'},
+                        {data: 'valuation', name: 'valuation'},
+                    ]
+                });
+            }
+            let so_arr=[];
+            function selectSO(id){
+                if(!so_arr.includes(id)){          //checking weather array contain the id
+                    so_arr.push(id);               //adding to array because value doesnt exists
+                }else{
+                    so_arr.splice(so_arr.indexOf(id), 1);  //deleting
+                }
+                // arr.push(id);
+                console.log(so_arr);
+            }
+            let bo_arr=[];
+            function selectBO(id){
+                console.log(id)
+                if(!bo_arr.includes(id)){          //checking weather array contain the id
+                    bo_arr.push(id);               //adding to array because value doesnt exists
+                }else{
+                    bo_arr.splice(bo_arr.indexOf(id), 1);  //deleting
+                }
+                // arr.push(id);
+                console.log(bo_arr , 'sdasd');
+            }
+        </script>
+        <script>
+            let SOOrderID = '';
+            $("#saveSOButton").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "{{url('save-sale-order')}}",
+                    data: {
+                        "_token": "{{csrf_token()}}",
+                        "contact": $('#so_contact').val(),
+                        "company": "{{$active_company->company_id}}",
+                        "category": $('#so_category').val(),
+                        "price": $('#so_price').val(),
+                        "est_size": $('#so_est_size').val(),
+                        "share_class": $('#so_share_class').val(),
+                        "structure": $('#so_structure').val(),
+                        "fee_structure": $('#so_fee_structure').val(),
+                        "bo_comment": $('#so_comment').val(),
+                    },
+                    success: function (result) {
+                        if (result.status) {
+                            alert(result.message);
+                            window.location.reload();
+                        }
                     }
-                }
+                });
             });
-        });
 
-        function getSO_ID(id) {
-            SOOrderID = id;
-            $.ajax({
-                type: "GET",
-                url: "{{url('edit-sale-order')}}" + "/" + id,
-                success: function (res) {
-                    let result = res.data;
-                    $('#edit_so_price').val(result.pps);
-                    $('#edit_so_est_size').val(result.estsize);
-                    $('#edit_so_comment').val(result.comments);
-                    $('#edit_so_fee_structure').val(result.fee_structure);
-                    $("#edit_so_contact option[value=" + result.user_id + "]").prop("selected", true);
-                    $("#edit_so_category option[value="+result.category_id+"]").prop("selected", true);
-                    $("#edit_so_share_class option[value="+result.shareclass+"]").prop("selected", true);
-                    $("#edit_so_structure option[value='"+result.structure+"']").prop("selected", true);
-                }
-            });
-        }
-
-        $("#updateSOButton").click(function () {
-            $.ajax({
-                type: "POST",
-                url: "{{url('update-sale-order')}}"+"/"+SOOrderID,
-                data: {
-                    "_token": "{{csrf_token()}}",
-                    "contact": $('#edit_so_contact').val(),
-                    "company": "{{$active_company->company_id}}",
-                    "category": $('#edit_so_category').val(),
-                    "price": $('#edit_so_price').val(),
-                    "est_size": $('#edit_so_est_size').val(),
-                    "share_class": $('#edit_so_share_class').val(),
-                    "structure": $('#edit_so_structure').val(),
-                    "fee_structure": $('#edit_so_fee_structure').val(),
-                    "bo_comment": $('#edit_so_comment').val(),
-                },
-                success: function (result) {
-                    if (result.status) {
-                        alert(result.message);
-                        window.location.reload();
+            function getSO_ID(id) {
+                SOOrderID = id;
+                $.ajax({
+                    type: "GET",
+                    url: "{{url('edit-sale-order')}}" + "/" + id,
+                    success: function (res) {
+                        let result = res.data;
+                        $('#edit_so_price').val(result.pps);
+                        $('#edit_so_est_size').val(result.estsize);
+                        $('#edit_so_comment').val(result.comments);
+                        $('#edit_so_fee_structure').val(result.fee_structure);
+                        $("#edit_so_contact option[value=" + result.user_id + "]").prop("selected", true);
+                        $("#edit_so_category option[value="+result.category_id+"]").prop("selected", true);
+                        $("#edit_so_share_class option[value="+result.shareclass+"]").prop("selected", true);
+                        $("#edit_so_structure option[value='"+result.structure+"']").prop("selected", true);
                     }
-                }
-            });
-        });
+                });
+            }
 
-    </script>
-
-    <script>
-
-        $("#pairBuyOrder").click(function () {
-            $.ajax({
-                type: "POST",
-                url: "{{url('pair-buy-order')}}",
-                data: {
-                    "_token": "{{csrf_token()}}",
-                    "sell_orders":so_arr,
-                    "buy_order":BuyOrderID,
-                    "company_id":"{{$active_company->company_id}}",
-                    "comment":$('#pair_bo_comment').val()
-                },
-                success: function (result) {
-                    if (result.status) {
-                        alert(result.message);
-                        window.location.reload();
+            $("#updateSOButton").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "{{url('update-sale-order')}}"+"/"+SOOrderID,
+                    data: {
+                        "_token": "{{csrf_token()}}",
+                        "contact": $('#edit_so_contact').val(),
+                        "company": "{{$active_company->company_id}}",
+                        "category": $('#edit_so_category').val(),
+                        "price": $('#edit_so_price').val(),
+                        "est_size": $('#edit_so_est_size').val(),
+                        "share_class": $('#edit_so_share_class').val(),
+                        "structure": $('#edit_so_structure').val(),
+                        "fee_structure": $('#edit_so_fee_structure').val(),
+                        "bo_comment": $('#edit_so_comment').val(),
+                    },
+                    success: function (result) {
+                        if (result.status) {
+                            alert(result.message);
+                            window.location.reload();
+                        }
                     }
-                }
+                });
             });
-        });
-        $("#pairSellOrder").click(function () {
-        console.log(bo_arr)
-            $.ajax({
-                type: "POST",
-                url: "{{url('pair-sell-order')}}",
-                data: {
-                    "_token": "{{csrf_token()}}",
-                    "buy_orders":bo_arr,
-                    "sell_order":SOOrderID,
-                    "company_id":"{{$active_company->company_id}}",
-                    "comment":$('#pair_so_comment').val()
-                },
-                success: function (result) {
-                    if (result.status) {
-                        alert(result.message);
-                        window.location.reload();
+
+        </script>
+
+        <script>
+
+            $("#pairBuyOrder").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "{{url('pair-buy-order')}}",
+                    data: {
+                        "_token": "{{csrf_token()}}",
+                        "sell_orders":so_arr,
+                        "buy_order":BuyOrderID,
+                        "company_id":"{{$active_company->company_id}}",
+                        "comment":$('#pair_bo_comment').val()
+                    },
+                    success: function (result) {
+                        if (result.status) {
+                            alert(result.message);
+                            window.location.reload();
+                        }
                     }
-                }
+                });
             });
-        });
-
-        $('#saveHold').click(function () {
-            $.ajax({
-                type: "POST",
-                url: "{{url('save-holding')}}",
-                data: {
-                    "_token": "{{csrf_token()}}",
-                    "hold_contact":$('#hold_contact').val(),
-                    "holding":$('#holding').val(),
-                    "hold_pps":$('#hold_pps').val(),
-                    "hold_target":$('#hold_target').val(),
-                    "hold_share_class":$('#hold_share_class').val(),
-                    "hold_comment":$('#hold_comment').val(),
-                    "company_id":"{{$active_company->company_id}}"
-                },
-                success: function (result) {
-                    if (result.status) {
-                        alert(result.message);
-                        window.location.reload();
+            $("#pairSellOrder").click(function () {
+                console.log(bo_arr)
+                $.ajax({
+                    type: "POST",
+                    url: "{{url('pair-sell-order')}}",
+                    data: {
+                        "_token": "{{csrf_token()}}",
+                        "buy_orders":bo_arr,
+                        "sell_order":SOOrderID,
+                        "company_id":"{{$active_company->company_id}}",
+                        "comment":$('#pair_so_comment').val()
+                    },
+                    success: function (result) {
+                        if (result.status) {
+                            alert(result.message);
+                            window.location.reload();
+                        }
                     }
-                }
+                });
             });
-        });
-        let holdID=null;
-        function getHoldID(id) {
-            holdID = id;
-            $.ajax({
-                type: "GET",
-                url: "{{url('edit-holding')}}" + "/" + id,
-                success: function (res) {
-                    let result = res.data;
-                    $("#edit_hold_contact option[value=" + result.user_id + "]").prop("selected", true);
-                    $('#edit_holding').val(result.holding);
-                    $('#edit_hold_pps').val(result.pps);
-                    $('#edit_hold_target').val(result.target);
-                    $("#edit_hold_share_class option[value="+result.shareclass+"]").prop("selected", true);
-                    $('#edit_hold_comment').val(result.comments);
-                }
-            });
-        }
 
-        $('#updateHold').click(function () {
-            $.ajax({
-                type: "POST",
-                url: "{{url('update-holding')}}"+"/"+holdID,
-                data: {
-                    "_token": "{{csrf_token()}}",
-                    "hold_contact":$('#edit_hold_contact').val(),
-                    "holding":$('#edit_holding').val(),
-                    "hold_pps":$('#edit_hold_pps').val(),
-                    "hold_target":$('#edit_hold_target').val(),
-                    "hold_share_class":$('#edit_hold_share_class').val(),
-                    "hold_comment":$('#edit_hold_comment').val(),
-                    "company_id":"{{$active_company->company_id}}"
-                },
-                success: function (result) {
-                    if (result.status) {
-                        alert(result.message);
-                        window.location.reload();
+            $('#saveHold').click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "{{url('save-holding')}}",
+                    data: {
+                        "_token": "{{csrf_token()}}",
+                        "hold_contact":$('#hold_contact').val(),
+                        "holding":$('#holding').val(),
+                        "hold_pps":$('#hold_pps').val(),
+                        "hold_target":$('#hold_target').val(),
+                        "hold_share_class":$('#hold_share_class').val(),
+                        "hold_comment":$('#hold_comment').val(),
+                        "company_id":"{{$active_company->company_id}}"
+                    },
+                    success: function (result) {
+                        if (result.status) {
+                            alert(result.message);
+                            window.location.reload();
+                        }
                     }
-                }
+                });
+            });
+            let holdID=null;
+            function getHoldID(id) {
+                holdID = id;
+                $.ajax({
+                    type: "GET",
+                    url: "{{url('edit-holding')}}" + "/" + id,
+                    success: function (res) {
+                        let result = res.data;
+                        $("#edit_hold_contact option[value=" + result.user_id + "]").prop("selected", true);
+                        $('#edit_holding').val(result.holding);
+                        $('#edit_hold_pps').val(result.pps);
+                        $('#edit_hold_target').val(result.target);
+                        $("#edit_hold_share_class option[value="+result.shareclass+"]").prop("selected", true);
+                        $('#edit_hold_comment').val(result.comments);
+                    }
+                });
+            }
+
+            $('#updateHold').click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "{{url('update-holding')}}"+"/"+holdID,
+                    data: {
+                        "_token": "{{csrf_token()}}",
+                        "hold_contact":$('#edit_hold_contact').val(),
+                        "holding":$('#edit_holding').val(),
+                        "hold_pps":$('#edit_hold_pps').val(),
+                        "hold_target":$('#edit_hold_target').val(),
+                        "hold_share_class":$('#edit_hold_share_class').val(),
+                        "hold_comment":$('#edit_hold_comment').val(),
+                        "company_id":"{{$active_company->company_id}}"
+                    },
+                    success: function (result) {
+                        if (result.status) {
+                            alert(result.message);
+                            window.location.reload();
+                        }
+                    }
+                });
+
             });
 
-        });
-
-    </script>
-    <!-- Search code -->
-    <script>
-        $(document).ready(function ($) {
+        </script>
+        <!-- Search code -->
+        <script>
+            // $(document).ready(function ($) {
             $('.live-search-list li a span').each(function () {
+                // alert('here');
                 $(this).attr('data-search-term', $(this).text().toLowerCase());
             });
 
-            $('.live-search-box').on('keyup', function () {
+            $('.live-search-box').on('keyup',function () {
+                var input, filter, ul, li, a, i, txtValue;
+                input = document.getElementById("search");
+                filter = input.value.toUpperCase();
+                ul = document.getElementById("menu");
+                li = ul.getElementsByTagName("li");
 
-                var searchTerm = $(this).val().toLowerCase();
-                $('.live-search-list li ').each(function () {
-                    if ($(this).find('a span').filter('[data-search-term *= ' + searchTerm + ']').length > 0 || searchTerm.length < 1) {
-                        $(this).show();
+                for (i = 0; i < li.length; i++) {
+                    let  outerA = li[i].getElementsByTagName("a")[0];
+                    a = outerA.getElementsByTagName('span')[0];
+                    console.log(a);
+                    txtValue = a.textContent || a.innerText;
+                    console.log(txtValue + " filter "+filter);
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        console.log("match");
+                        li[i].setAttribute('class','d-flex align-items-center justify-content-between');
                     } else {
-                        $(this).hide();
-                    }
-                });
-            });
-        });
-    </script>
-{{--    Pair Order--}}
-    <script>
-        var table=null;
-        $(function () {
-            table =  $('#paired_orders_table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url:"{{ route('getPairOrders') }}",
-                    data: function (d) {
-                        d.company_id = "{{$active_company->company_id}}";
-                    }
-                },
-                columns: [
-                    {data: 'dt_id', name: 'dt_id'},
-                    {data: 'dt_contacts', name: 'dt_contacts'},
-                    {data: 'dt_est_size', name: 'dt_est_size'},
-                    {data: 'dt_pps', name: 'dt_pps'},
-                    {data: 'dt_valuation', name: 'dt_valuation'},
-                    {data: 'dt_share_class', name: 'dt_share_class'},
-                    {data: 'dt_structure', name: 'dt_structure'},
-                        @if(auth()->user()->hasRole('Admin'))
-                    {data: 'dt_fee_structure', name: 'dt_fee_structure'},
-                    {data: 'dt_comments', name: 'dt_comments'}
-                    @endif
-                ]
-            });
+                        console.log("not match");
 
-        });
-
-        function deletePair(id) {
-            $.ajax({
-                type: "POST",
-                url: "{{url('delete-matching')}}",
-                data: {
-                    "_token": "{{csrf_token()}}",
-                    'match_id':id
-                },
-                success: function (result) {
-                    table.draw();
+                        li[i].setAttribute('class','d-none');
+                    }
                 }
             });
-        }
+            // function () {
+            //
+            //     var searchTerm = $(this).val().toLowerCase();
+            //     console.log(searchTerm);
+            //     $('.live-search-list li').each(function () {
+            //         console.log($(this).find('a span'));
+            //         if ($(this).find('a span').filter('[data-search-term *= ' + searchTerm + ']').length > 0 || searchTerm.length < 1) {
+            //             $(this).show();
+            //         } else {
+            //             $(this).hide();
+            //         }
+            //     });
+            // }
+            // });
+        </script>
+        {{--    Pair Order--}}
+        <script>
+            var table=null;
+            $(function () {
+                table =  $('#paired_orders_table').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url:"{{ route('getPairOrders') }}",
+                        data: function (d) {
+                            d.company_id = "{{$active_company->company_id}}";
+                        }
+                    },
+                    columns: [
+                        {data: 'dt_id', name: 'dt_id'},
+                        {data: 'dt_contacts', name: 'dt_contacts'},
+                        {data: 'dt_est_size', name: 'dt_est_size'},
+                        {data: 'dt_pps', name: 'dt_pps'},
+                        {data: 'dt_valuation', name: 'dt_valuation'},
+                        {data: 'dt_share_class', name: 'dt_share_class'},
+                        {data: 'dt_structure', name: 'dt_structure'},
+                            @if(auth()->user()->hasRole('Admin'))
+                        {data: 'dt_fee_structure', name: 'dt_fee_structure'},
+                        {data: 'dt_comments', name: 'dt_comments'}
+                        @endif
+                    ]
+                });
 
-        function deleteCompanyRecord() {
-            var result = confirm("Are you sure you want to delete all Record of Company?");
+            });
 
-            if (result) {
+            function deletePair(id) {
                 $.ajax({
                     type: "POST",
-                    url: "{{url('delete-company-record')}}",
+                    url: "{{url('delete-matching')}}",
                     data: {
                         "_token": "{{csrf_token()}}",
-                        'id': "{{$active_company->company_id}}"
+                        'match_id':id
                     },
-                    success: function (response) {
-                        alert(response.message)
-                        location.reload();
+                    success: function (result) {
+                        table.draw();
                     }
                 });
             }
-        }
-        @if(session()->has('filter_success'))
+
+            function deleteCompanyRecord() {
+                var result = confirm("Are you sure you want to delete all Record of Company?");
+
+                if (result) {
+                    $.ajax({
+                        type: "POST",
+                        url: "{{url('delete-company-record')}}",
+                        data: {
+                            "_token": "{{csrf_token()}}",
+                            'id': "{{$active_company->company_id}}"
+                        },
+                        success: function (response) {
+                            alert(response.message)
+                            location.reload();
+                        }
+                    });
+                }
+            }
+            @if(session()->has('filter_success'))
             alert("{{session()->get('filter_success')}}");
             @endif
-        @if(session()->has('filter_failed'))
+            @if(session()->has('filter_failed'))
             alert("{{session()->get('filter_failed')}}");
             @endif
-         @if(session()->has('filters'))
-          $('#sectors_filter').val({{implode(',',session()->get('filters')['sectors_filter'])}});
+            @if(session()->has('filters'))
+            $('#sectors_filter').val({{implode(',',session()->get('filters')['sectors_filter'])}});
             @endif
 
-    </script>
-@endpush
+        </script>
+    @endpush
+
+@else
+    <h5>No Company Found</h5>
+    <!--Add  filter Modal = -->
+    <div class="modal fade" id="addFilterModal" tabindex="-1" role="dialog"
+         aria-labelledby="addFilterModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <form action="{{url('company-filter')}}" method="post">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5>Filters</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12 form-group">
+                                <label for="location">location</label>
+                                <select name="location_filter" id="location_filter" class="form-control">
+                                    <option value="">No Filter</option>
+                                    @foreach($locations as $location)
+                                        <option value="{{$location->geog_id}}" {{session()->has('filters') ? (session()->get('filters')['location_filter']== $location->geog_id ? 'selected' : '') : ''}}>{{$location->geogarea}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-12 form-group">
+                                <label for="sectors">Sectors</label>
+                                <select name="sectors_filter[]" id="sectors_filter" class="select2-class" multiple="multiple" style="width: 100% !important;">
+                                    @foreach($sectors as $sector)
+                                        <option value="{{$sector->sector_id}}" >{{$sector->sectorname}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-12 form-group">
+                                <label for="business_filter">
+                                    Business Model Orientation</label>
+                                <select name="business_filter" id="business_filter" class="form-control">
+                                    <option value="">No Filter</option>
+                                    @foreach($business as $bus)
+                                        <option value="{{$bus->business_id}}" {{session()->has('filters') ? (session()->get('filters')['business_filter']== $bus->business_id ? 'selected' : '') : ''}}>{{$bus->business_orient}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="filter">Apply Filter</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+@endif
+@endsection
+
+
+
+

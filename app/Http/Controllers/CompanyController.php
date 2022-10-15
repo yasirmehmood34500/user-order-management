@@ -25,30 +25,38 @@ class CompanyController extends Controller
     public function index()
     {
         $companies=[];
+//        dd(\session()->get('filters'));
+//            dd(\session()->get('filters'));
         if (\session()->has('filters')){
-            if (!is_null(\session()->get('filters')['location_filter']) && !is_null(\session()->get('filters')['sectors_filter']) && !is_null(\session()->get('filters')['business_filter'])){
-                $companies =Company::with(['Sectors.Sector'])->where('geog_id',\session()->get('filters')['location_filter'])->whereHas('Sectors',function ($q){
+//            dd('lb');
+
+            if (!is_null(\session()->get('filters')['location_filter']) && count(\session()->get('filters')['sectors_filter']) > 0 && !is_null(\session()->get('filters')['business_filter'])){
+                $companies =Company::with(['Sectors.Sector','Business'])->where('geog_id',\session()->get('filters')['location_filter'])->whereHas('Sectors',function ($q){
                     $q->whereIn('sector_id',\session()->get('filters')['sectors_filter']);
                 })->where('business_id',\session()->get('filters')['business_filter'])->orderBy('comp_name', 'ASC')->get();
             }
-            elseif (!is_null(\session()->get('filters')['location_filter']) && !is_null(\session()->get('filters')['sectors_filter'])){
-                $companies =Company::with(['Sectors.Sector'])->where('geog_id',\session()->get('filters')['location_filter'])->whereHas('Sectors',function ($q){
+            elseif (!is_null(\session()->get('filters')['location_filter']) && count(\session()->get('filters')['sectors_filter']) >0){
+                $companies =Company::with(['Sectors.Sector','Business'])->where('geog_id',\session()->get('filters')['location_filter'])->whereHas('Sectors',function ($q){
                     $q->whereIn('sector_id',\session()->get('filters')['sectors_filter']);
                 })->orderBy('comp_name', 'ASC')->get();
             }
+            elseif (!is_null(\session()->get('filters')['location_filter']) && !is_null(\session()->get('filters')['business_filter'])){
+                $companies =Company::with(['Sectors.Sector','Business'])->where('geog_id',\session()->get('filters')['location_filter'])
+                    ->where('business_id',\session()->get('filters')['business_filter'])->orderBy('comp_name', 'ASC')->get();
+            }
             elseif (!is_null(\session()->get('filters')['location_filter'])){
-//            dd(\session()->get('filters'));
-                $companies =Company::with(['Sectors.Sector'])->where('geog_id',\session()->get('filters')['location_filter'])->orderBy('comp_name', 'ASC')->get();
-            }elseif (!is_null(\session()->get('filters')['sectors_filter'])){
-                $companies =Company::with(['Sectors.Sector'])->whereHas('Sectors',function ($q){
+                $companies =Company::with(['Sectors.Sector','Business'])->where('geog_id',\session()->get('filters')['location_filter'])->orderBy('comp_name', 'ASC')->get();
+            }elseif (count(\session()->get('filters')['sectors_filter']) > 0){
+                $companies =Company::with(['Sectors.Sector','Business'])->whereHas('Sectors',function ($q){
                     $q->whereIn('sector_id',\session()->get('filters')['sectors_filter']);
                 })->orderBy('comp_name', 'ASC')->get();
 
             }elseif (!is_null(\session()->get('filters')['business_filter'])){
-                $companies = Company::with(['Sectors.Sector'])->where('business_id',\session()->get('filters')['business_filter'])->orderBy('comp_name', 'ASC')->get();
+
+                $companies = Company::with(['Sectors.Sector','Business'])->where('business_id',\session()->get('filters')['business_filter'])->orderBy('comp_name', 'ASC')->get();
             }
         }else{
-            $companies = Company::with(['Sectors.Sector'])->orderBy('comp_name', 'ASC')->get();
+            $companies = Company::with(['Sectors.Sector','Business'])->orderBy('comp_name', 'ASC')->get();
         }
 
         $sectors = Sector::all();
@@ -63,7 +71,7 @@ class CompanyController extends Controller
         if (\request('search')){
             $activeCompany = Company::with(['Sectors.Sector'])->where('company_id',\request('search'))->first();
         } else {
-            $activeCompany = count($companies) > 0 ?  $companies[0] : '';
+            $activeCompany = count($companies) > 0 ?  $companies[0] : null;
         }
 
 
@@ -216,7 +224,7 @@ class CompanyController extends Controller
         if ($request->location_filter || $request->sectors_filter || $request->business_filter) {
             $filters = [
                 'location_filter' => $request->location_filter,
-                'sectors_filter' => array_values($request->sectors_filter),
+                'sectors_filter' => $request->sectors_filter ? array_values($request->sectors_filter): [],
                 'business_filter' => $request->business_filter
             ];
             Session::put('filters', $filters);
