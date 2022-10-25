@@ -19,6 +19,15 @@ Route::get('/', function () {
     return view('auth.login');
 });
 
+Route::get('artisan', function () {
+    Artisan::call('view:clear');
+    Artisan::call('route:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('config:cache');
+    Artisan::call('storage:link');
+});
+
+
 // Route::get('login', [UserController::class, 'login_page'])->name("login_page");
 Route::get('dashboard', [UserController::class, 'dashboard_page'])->name("dashboard_page");
 
