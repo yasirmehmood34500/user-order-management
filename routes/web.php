@@ -25,6 +25,7 @@ Route::get('artisan', function () {
     Artisan::call('cache:clear');
     Artisan::call('config:cache');
     Artisan::call('storage:link');
+    Artisan::call('optimize');
 });
 
 
