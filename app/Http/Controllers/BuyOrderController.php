@@ -38,7 +38,11 @@ class BuyOrderController extends Controller
         if (\request('search')){
             $activeCompany = Company::where('company_id',\request('search'))->first();
         } else {
-            $activeCompany = $companies[0];
+            if (count($companies) > 0) {
+                $activeCompany = $companies[0];
+            }else{
+                $activeCompany=null;
+            }
         }
 
 

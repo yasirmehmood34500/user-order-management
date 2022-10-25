@@ -175,6 +175,14 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6 form-group">
+                            <label for="edit_bo_company">Company</label>
+                            <select name="edit_bo_company" id="edit_bo_company" class="form-control">
+                                @foreach($companies as $company)
+                                    <option value="{{$company->company_id}}">{{$company->comp_name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
                             <label for="contact">Contacts</label>
                             <select name="contact" id="edit_contact" class="form-control">
                                 @foreach($contacts as $contact)
@@ -339,6 +347,7 @@
                     $('#edit_est_size').val(result.estsize);
                     $('#edit_bo_comment').val(result.comments);
                     $("#edit_contact option[value=" + result.user_id + "]").prop("selected", true);
+                    $("#edit_bo_company option[value=" + result.company_id + "]").prop("selected", true);
                     $("#edit_category option[value="+result.category_id+"]").prop("selected", true);
                     $("#edit_share_class option[value="+result.shareclass+"]").prop("selected", true);
                     $("#edit_structure option[value='"+result.structure+"']").prop("selected", true);
@@ -449,7 +458,7 @@
                 data: {
                     "_token": "{{csrf_token()}}",
                     "contact": $('#edit_contact').val(),
-                    "company": "{{$active_company->company_id}}",
+                    "company": $('#edit_bo_company').val(),
                     "category": $('#edit_category').val(),
                     "price": $('#edit_price').val(),
                     "fee_structure": $('#edit_fee_structure').val(),

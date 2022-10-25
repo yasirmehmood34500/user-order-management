@@ -38,25 +38,26 @@
     <div class="app-admin-wrap layout-sidebar-vertical sidebar-full ">
         <div class="sidebar-panel position-fixed d-block">
             <div class="pt-4 pl-4">
-
+                <a href="/companies">
+                    <i class="nav-icon i-File-Clipboard-Text--Image mr-3 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Companies"></i>
+                </a>
 
                 <a href="/contacts">
                     <i class="i-Add-UserStar mr-3 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Contacts"></i>
                 </a>
-                <a href="/companies">
-                    <i class="nav-icon i-File-Clipboard-Text--Image mr-3 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Companies"></i>
-                </a>
+                
                 @if(auth()->user()->hasRole('Admin'))
                 <a href="/paired-order">
                     <i class="nav-icon i-Split-Vertical mr-3 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Paired Orders"></i>
                 </a>
                 @endif
-                <a href="/sell-orders">
-                    <i class="nav-icon i-Line-Chart-2 mr-3  text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Sell Orders"></i>
-                </a>
                 <a href="/buy-orders">
                     <i class="nav-icon i-Add-Cart  mr-3 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Buy orders"></i>
                 </a>
+                <a href="/sell-orders">
+                    <i class="nav-icon i-Line-Chart-2 mr-3  text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Sell Orders"></i>
+                </a>
+                
 
 {{--                <a href="/acquistion-targets">--}}
 {{--                    <i class="i-Circular-Point  mr-3 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Acquistion Targets"></i>--}}
