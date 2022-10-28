@@ -25,7 +25,7 @@
                     <a href="{{url('contacts?search=').$user->id}}">
                         <span class="item-name text-15 text-muted">{{$user->name}}</span>
                     </a>
-                    {{-- <span class="company_delete_btn text-danger cursor-pointer p-2" onclick="deleteFromGrid({{ $user->id }},6)">x</span> --}}
+                    <span class="company_delete_btn text-danger cursor-pointer p-2" onclick="deleteFromGrid({{ $user->id }},6)">x</span>
 
                 </li>
             @endforeach
@@ -525,7 +525,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    {{-- <button type="button" class="btn btn-danger" onclick="deleteUserRecord()">Delete</button> --}}
+                    <button type="button" class="btn btn-danger" onclick="deleteUserRecord()">Delete</button>
                     <button type="button" class="btn btn-primary" id="updateButton">Update changes</button>
                 </div>
             </div>

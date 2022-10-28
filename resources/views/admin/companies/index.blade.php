@@ -25,7 +25,7 @@
                     <a href="{{url('companies?search=').$company->company_id}}">
                         <span class="item-name text-15 text-muted">{{$company->comp_name}}</span>
                     </a>
-                        {{-- <span class="company_delete_btn text-danger cursor-pointer p-2" onclick="deleteFromGrid({{ $company->company_id }},5)">x</span> --}}
+                        <span class="company_delete_btn text-danger cursor-pointer p-2" onclick="deleteFromGrid({{ $company->company_id }},5)">x</span>
                 </li>
             @endforeach
             @if(auth()->user()->hasRole('Admin'))
@@ -1110,7 +1110,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                {{-- <button type="button" class="btn btn-danger" onclick="deleteCompanyRecord()">Delete</button> --}}
+                <button type="button" class="btn btn-danger" onclick="deleteCompanyRecord()">Delete</button>
                 <button type="button" class="btn btn-primary" id="updateButton">Update changes</button>
             </div>
         </div>
