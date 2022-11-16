@@ -205,6 +205,9 @@ class CompanyController extends Controller
         }elseif($type=='target'){
             AcqTarget::where('target_id',$id)->delete();
             return response()->json(['status' => true, 'message' => 'Target Deleted']);
+        }elseif($type=='pair'){
+            matching::where('match_id',$id)->delete();
+            return response()->json(['status' => true, 'message' => 'paired order Deleted']);
         }
 
     }

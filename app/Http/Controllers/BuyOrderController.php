@@ -62,6 +62,7 @@ class BuyOrderController extends Controller
     }
     public function buyOrders(Request $request)
     {
+        // dd($request);
         if ($request->ajax()) {
 //            dd(auth()->user()->hasRole('Admin'));
             if (auth()->user()->hasRole('Admin')) {
@@ -69,12 +70,14 @@ class BuyOrderController extends Controller
                 if ($request->filter_orders_of == 'company') {
                     $data = BuyOrder::query()->with(['Contact', 'Company'])->where('company_id',$request->id)->get();
                 }else if ($request->filter_orders_of == 'contacts'){
-                    $data = BuyOrder::query()->with(['Contact', 'Company'])->where('user_id',$request->id)->get();
+                    $data = BuyOrder::query()->with(['Contact', 'Company'])->where('user_id',$request->id)->orwhere('user_id',$request->user_id)->get();
                 }else{
                     $data = BuyOrder::query()->with(['Contact', 'Company'])->get();
                 }
             }else{
-                if ($request->id) {
+                if ($request->user_id) {
+                    $data = BuyOrder::query()->where('user_id', Auth::id())->get();
+                } else if ($request->id) {
                     $data = BuyOrder::query()->where('user_id', Auth::id())->where('company_id', $request->id)->get();
                 }else{
                     $data = BuyOrder::query()->where('user_id', Auth::id())->get();

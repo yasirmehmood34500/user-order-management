@@ -31,7 +31,14 @@
         .active a span{
             color: white !important;
         }
+
+        .app-admin-wrap.sidebar-full .sidebar-panel {
+            width: 260px !important;
+            left: 0px;
+         }
     </style>
+
+
 </head>
 
 <body class="text-left">
@@ -39,25 +46,28 @@
         <div class="sidebar-panel position-fixed d-block">
             <div class="pt-4 pl-4">
                 <a href="/companies">
-                    <i class="nav-icon i-File-Clipboard-Text--Image mr-3 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Companies"></i>
+                    <i class="nav-icon i-File-Clipboard-Text--Image mr-1 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Companies"></i>
                 </a>
 
                 <a href="/contacts">
-                    <i class="i-Add-UserStar mr-3 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Contacts"></i>
+                    <i class="i-Add-UserStar mr-2 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Contacts"></i>
                 </a>
-                
+
                 @if(auth()->user()->hasRole('Admin'))
                 <a href="/paired-order">
-                    <i class="nav-icon i-Split-Vertical mr-3 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Paired Orders"></i>
+                    <i class="nav-icon i-Split-Vertical mr-2 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Paired Orders"></i>
                 </a>
                 @endif
                 <a href="/buy-orders">
-                    <i class="nav-icon i-Add-Cart  mr-3 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Buy orders"></i>
+                    <i class="nav-icon i-Add-Cart  mr-2 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Buy orders"></i>
                 </a>
                 <a href="/sell-orders">
-                    <i class="nav-icon i-Line-Chart-2 mr-3  text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Sell Orders"></i>
+                    <i class="nav-icon i-Line-Chart-2 mr-2  text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Sell Orders"></i>
                 </a>
-                
+                {{-- <span> --}}
+                <i class="nav-icon mr-2  text-16 text-secondary cursor-pointer fa fa-sign-out" id="sign-out-icon"   aria-hidden="true" data-toggle="tooltip" data-placement="top" title="" data-original-title="logout"></i>
+                {{-- </span> --}}
+
 
 {{--                <a href="/acquistion-targets">--}}
 {{--                    <i class="i-Circular-Point  mr-3 text-20 cursor-pointer" data-toggle="tooltip" data-placement="top" title="" data-original-title="Acquistion Targets"></i>--}}
@@ -79,7 +89,7 @@
             <div class="text-right">
                 <form action="{{url('logout')}}" method="post">
                     @csrf
-                    <button class="btn btn-muted btn-sm badge-outline-dark text-right">
+                    <button class="btn btn-muted btn-sm badge-outline-dark text-right" id="logout-btn">
                         logout
                     </button>
                 </form>
@@ -92,6 +102,8 @@
 
         </div>
     </div>
+
+
 
     <script src="{{asset('dist-assets/js/plugins/jquery-3.3.1.min.js')}}"></script>
     <script src="{{asset('dist-assets/js/plugins/bootstrap.bundle.min.js')}}"></script>
@@ -106,6 +118,8 @@
     <script src="{{asset('dist-assets/js/plugins/echarts.min.js')}}"></script>
     <script src="{{asset('dist-assets/js/scripts/echart.options.min.js')}}"></script>
     <script src="{{asset('dist-assets/js/scripts/dashboard.v1.script.min.js')}}"></script>
+
+
     <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
@@ -124,6 +138,8 @@
                 type='company';
             }else if (ty==6){
                 type='contact';
+            }else if (ty==7){
+                type='pair';
             }
 
             var result = confirm("Are you sure you want to delete current item");
@@ -157,6 +173,9 @@
         // In your Javascript (external .js resource or <script> tag)
         $(document).ready(function() {
             $('.select2-class').select2();
+            $('#sign-out-icon').on('click', function(){
+                $('#logout-btn').click();
+            });
         });
     </script>
 

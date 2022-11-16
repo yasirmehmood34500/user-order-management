@@ -25,7 +25,7 @@
                     <a href="{{url('contacts?search=').$user->id}}">
                         <span class="item-name text-15 text-muted">{{$user->name}}</span>
                     </a>
-                    <span class="company_delete_btn text-danger cursor-pointer p-2" onclick="deleteFromGrid({{ $user->id }},6)">x</span>
+                    {{-- <span class="company_delete_btn text-danger cursor-pointer p-2" onclick="deleteFromGrid({{ $user->id }},6)">x</span> --}}
 
                 </li>
             @endforeach
@@ -51,10 +51,10 @@
             <div class="card">
                 <div class="card-header d-flex">
                     <h4 class="col-md-4">{{ strtoupper($active_user->name) }}
-                        @if(auth()->user()->hasRole('Admin'))
+                        {{-- @if(auth()->user()->hasRole('Admin')) --}}
                             <i id="editButton" class="fa fa-edit ml-2 fa--customer-icon" data-toggle="modal"
                                data-target="#editUserModal"></i>
-                        @endif
+                        {{-- @endif --}}
                     </h4>
                 </div>
 
@@ -525,7 +525,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" onclick="deleteUserRecord()">Delete</button>
+                    @if(auth()->user()->hasRole('Admin'))
+                        <button type="button" class="btn btn-danger {{ $active_user->id == 1 ? 'd-none' : '' }}" onclick="deleteUserRecord()" id="deleteContactDataBtn">Delete</button>
+                    @endif
                     <button type="button" class="btn btn-primary" id="updateButton">Update changes</button>
                 </div>
             </div>
@@ -874,7 +876,7 @@
                 ajax: {
                     url:"{{ route('buyOrders') }}",
                     data: function (d) {
-                        d.id = "{{$active_user->id}}";
+                        d.user_id = "{{$active_user->id}}";
                         d.filter_orders_of = "contacts";
                     }
                 },
@@ -903,7 +905,7 @@
                 ajax: {
                     url:"{{ route('sellOrders') }}",
                     data: function (d) {
-                        d.id = "{{$active_user->id}}";
+                        d.user_id = "{{$active_user->id}}";
                         d.filter_orders_of = "contacts";
                     }
                 },
